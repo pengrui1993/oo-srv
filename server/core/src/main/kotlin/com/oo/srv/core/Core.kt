@@ -43,7 +43,8 @@ internal object BeanMgr:BeanManager{
         return delegate.getBean(clazz)
     }
 }
-
+@Retention(AnnotationRetention.SOURCE)
+annotation class Final
 interface Module
 typealias CustomerId = Long
 typealias WaitressId = Long
@@ -69,7 +70,7 @@ interface CouponRepository
 interface InvitingCodeRepository
 //space
 typealias Address = Long //xx省 xx市 xx区 xx街道 xx小区 xx栋 xx单元 xx号
-typealias Position = Pair<Double,Double>
+typealias Position = Pair<Double,Double>//first lng ,second:lat
 //time
 typealias TimePoint = LocalDateTime
 typealias TimeDuration = Duration

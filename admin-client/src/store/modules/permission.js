@@ -52,7 +52,6 @@ const actions = {
       let accessedRoutes
       if (roles.includes('admin')) {
         accessedRoutes = asyncRoutes || []
-        console.log(accessedRoutes)
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }

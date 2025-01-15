@@ -44,7 +44,27 @@
           </span>
         </el-form-item>
       </el-tooltip>
-
+      <el-form-item prop="verification">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="verification"
+          v-model="loginForm.verification"
+          auto-complete="off"
+          placeholder="verification code"
+          name="verification"
+          style="width: 63%"
+          type="text"
+          tabindex="3"
+          @keyup.enter.native="handleLogin"
+        >
+          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+        </el-input>
+        <div class="login-code">
+          <img :src="codeUrl" class="login-code-img" @click="getCode">
+        </div>
+      </el-form-item>
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div style="position:relative">
@@ -76,7 +96,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
-
+import { Message } from 'element-ui'
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -95,14 +115,24 @@ export default {
         callback()
       }
     }
+    const validateVerification = (rule, value, callback) => {
+      if (value.length !== 4) {
+        callback(new Error('The verification code can not be 4 characters'))
+      } else {
+        callback()
+      }
+    }
     return {
+      codeUrl: '/dev-api/vue-element-admin/auth/captcha',
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '111111',
+        verification: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        verification: [{ required: true, trigger: 'blur', validator: validateVerification }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -138,6 +168,10 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    getCode() {
+      this.codeUrl = '/dev-api/vue-element-admin/auth/captcha?time=' + new Date().getTime()
+      this.loginForm.verification = ''
+    },
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -161,10 +195,18 @@ export default {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading = false
+              if (err && err.message && err.message === '51111') {
+                this.getCode()
+              }
             })
         } else {
+          Message({
+            message: '登录信息异常',
+            type: 'error',
+            duration: 3 * 1000
+          })
           console.log('error submit!!')
           return false
         }
@@ -201,6 +243,20 @@ export default {
 </script>
 
 <style lang="scss">
+.login-code {
+  position:absolute;
+  top:0%;
+  right: 0;
+  width: 30%;
+  height: 40px;
+  float: right;
+  img {
+    cursor: pointer;
+    vertical-align: middle;
+  }
+}
+.login-code-img {
+}
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
@@ -266,7 +322,11 @@ $light_gray:#eee;
     margin: 0 auto;
     overflow: hidden;
   }
-
+  .input-icon {
+    height: 39px;
+    width: 14px;
+    margin-left: 2px;
+  }
   .tips {
     font-size: 14px;
     color: #fff;

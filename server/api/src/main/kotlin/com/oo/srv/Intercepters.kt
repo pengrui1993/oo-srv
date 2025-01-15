@@ -1,6 +1,5 @@
 package com.oo.srv
 
-import com.oo.srv.core.Roles
 import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -14,11 +13,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.util.*
 
 @Configuration(proxyBeanMethods = false)
-class Config2(@Resource private val auth:AuthInterceptor
+class Config2(@Resource private val auth:AppAuthInterceptor
             ,@Resource private val adminAuth:AdminAuthInterceptor
 ): WebMvcConfigurer {
-    val clientApiPattern = "/oo-srv/api/**"
-    val adminApiPattern = "/dev-api/vue-element-admin/**"
+    val clientApiPattern = CLIENT_API_PATTERN
+    val adminApiPattern = ADMIN_API_PATTERN
     override fun addCorsMappings(registry: CorsRegistry) {
         listOf(clientApiPattern,adminApiPattern).forEach {
             registry.addMapping(it)
@@ -38,24 +37,33 @@ class Config2(@Resource private val auth:AuthInterceptor
 class AdminAuthInterceptor(
     @Resource val sessionManager:AdminSessionManager
 ):AsyncHandlerInterceptor{
-    private val log = LoggerFactory.getLogger(AdminAuthInterceptor::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         val api = AdminApi.from(request.requestURI)
+        if(!api.auth)return true
         val token = request.getHeader(ADMIN_AUTH_KEY)
-        if(Objects.nonNull(token))log.info("accept admin token:$token")
-        if(Objects.isNull(token)&&api.auth) throw AdminAuthenticationException()
+        if(Objects.isNull(token)) throw AdminAuthenticationException()
+        log.info("accept admin token:$token")
+        val userInfo = sessionManager.loadAdminUserInfo(token)
+        if(userInfo is DummyAdminUserInfo)throw AdminTokenExpiredException()
+        request.setAttribute(REQ_USER_KEY,userInfo)
         return true
     }
 }
 @Component
-class AuthInterceptor(@Resource val sessionManager:SessionManager) : AsyncHandlerInterceptor{
+class AppAuthInterceptor(
+    @Resource val sessionManager:SessionManager
+) : AsyncHandlerInterceptor{
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val api = Api.from(request.requestURI)
+        val api = AppApi.from(request.requestURI)
+        if(!api.auth)return true
         val token = request.getHeader(AUTH_KEY)
-        val role = sessionManager.roleByToken(token)
-        if(!api.isReadonly()&&api.auth&& Roles.GUEST==role){
-            throw AuthenticationException()
-        }
+        if(Objects.isNull(token))throw AuthenticationException()
+        val appUserInfo = sessionManager.loadAppUserInfo(token)
+        if(appUserInfo is DummyAppUserInfo) throw AuthenticationException()
+        AppRoles.GUEST
+        AppRoles.WAITRESS
+        AppRoles.CUSTOMER
         return true
     }
 }

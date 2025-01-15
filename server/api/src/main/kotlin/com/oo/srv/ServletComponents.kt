@@ -4,7 +4,6 @@ import jakarta.annotation.Resource
 import jakarta.servlet.*
 import jakarta.servlet.annotation.WebFilter
 import jakarta.servlet.annotation.WebListener
-import jakarta.servlet.annotation.WebServlet
 import jakarta.servlet.http.HttpServlet
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -19,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom
 
 //@Component //  that is no working when use redis to manage the session
 private object TomcatSessionManager: SessionListener{
-    private val log = LoggerFactory.getLogger(TomcatSessionManager::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun sessionEvent(e: SessionEvent) {
         log.info(e.toString())
     }
@@ -27,7 +26,7 @@ private object TomcatSessionManager: SessionListener{
 
 @Component
 private object RequestManager: ServletRequestListener{
-    private val log = LoggerFactory.getLogger(RequestManager::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun requestDestroyed(sre: ServletRequestEvent) {
         log.info(sre.toString())
     }
@@ -50,7 +49,7 @@ open class DemoServlet(@Resource val env: Environment): HttpServlet(){
 }
 @WebListener//must be public class
 class DemoListener: ServletContextListener {
-    private val log = LoggerFactory.getLogger(DemoListener::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun contextInitialized(sce: ServletContextEvent?) {
         log.info(sce.toString())
     }

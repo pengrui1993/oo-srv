@@ -8,7 +8,6 @@ import org.aspectj.lang.annotation.Pointcut
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
-private val log = LoggerFactory.getLogger(AopLogic::class.java)
 /**
  * 描述aop 调用的顺序
  */
@@ -18,6 +17,7 @@ annotation class LogAop
 @Aspect
 @Component
 class AopLogic {
+    private val log = LoggerFactory.getLogger(javaClass)
     //这个方法定义了切入点
     @Pointcut("@annotation(LogAop)")
     fun pc() {}

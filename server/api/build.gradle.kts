@@ -35,6 +35,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.session:spring-session-jdbc")
     runtimeOnly("org.postgresql:postgresql")
+//    implementation("com.h2database:h2")
     testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -49,7 +50,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.apache.tika:tika:3.0.0")
     implementation("org.apache.tika:tika-core:3.0.0")
-
+    implementation("com.github.whvcse:easy-captcha:1.6.2")
 }
 
 tasks.test {

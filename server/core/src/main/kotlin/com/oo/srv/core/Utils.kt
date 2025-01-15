@@ -6,13 +6,9 @@ import org.gavaghan.geodesy.GlobalCoordinates
 import java.util.*
 
 val uuid = { UUID.randomUUID().toString().replace("-","")}
-
-
 private fun main() {
     println("经纬度距离计算结果：" + haversine(109.371319, 22.155406, 108.009758, 21.679011) + "米")
 }
-
-
 private fun customerSearching(lat:Double,lng:Double,type:String){
     val sql = """
         SELECT*
@@ -28,7 +24,6 @@ private fun customerSearching(lat:Double,lng:Double,type:String){
 /*
 https://en.wikipedia.org/wiki/Haversine_formula
 Haversine algorithm in sql
-
 @Select("<script>SELECT*,ROUND(6378.138 * 2 * ASIN(SQRT(POW(SIN((#{lat} * PI() / 180 - lat * PI() / 180" +
         "    ) / 2),2) + COS(40.0497810000 * PI() / 180) * COS(lat * PI() / 180) * POW(" +
         "    SIN((#{lon} * PI() / 180 - lng * PI() / 180) / 2),2))) * 1000) AS dis" +
@@ -37,12 +32,14 @@ Haversine algorithm in sql
         "<if test =\"shopId > 0\">and id = #{shopId}</if>" +
         " ORDER BY dis ASC</script>"
 )
-
  */
 fun haversine(longitudeFrom: Double, latitudeFrom: Double, longitudeTo: Double, latitudeTo: Double): Double {
     val source = GlobalCoordinates(latitudeFrom, longitudeFrom)
     val target = GlobalCoordinates(latitudeTo, longitudeTo)
     return GeodeticCalculator().calculateGeodeticCurve(Ellipsoid.Sphere, source, target).ellipsoidalDistance
+}
+fun haversine(from:Position,too:Position):Double{
+    return haversine(from.first,from.second,too.first,too.second);
 }
 /*
 SELECT

@@ -1,17 +1,20 @@
 package com.oo.srv
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.CommandLineRunner
-import org.springframework.stereotype.Component
-
 @Retention(AnnotationRetention.SOURCE)
 annotation class Final
+@Retention(AnnotationRetention.SOURCE)
+annotation class Read
+@Retention(AnnotationRetention.SOURCE)
+annotation class Write
 
-
+const val APP_DOMAIN    = "https://app.habf.com"
+const val ADMIN_DOMAIN  = "https://admin.habf.com"
+const val FILE_DOMAIN   = "https://res.habf.com"
 
 const val WRITE = false
 const val READ = true
 const val AUTH_KEY = "AUTH"
+const val ADMIN_AUTH_KEY = "X-Token"
 const val DB_FILE_SEP = ";"
 
 const val SMS_LOGIN_URI                             = "/oo-srv/api/auth/sms-login"
@@ -39,11 +42,11 @@ const val FILE_UPLOAD_PARAMS                        = "/oo-srv/api/shared/file/u
 const val FILE_DOWNLOAD                             = "/oo-srv/api/shared/file/download"
 
 
-const val ADMIN_AUTH_KEY = "X-Token"
 
 const val ADMIN_USER_INFO_URI           = "/dev-api/vue-element-admin/user/info"
 const val ADMIN_TRANSACTION_LIST_URI    = "/dev-api/vue-element-admin/transaction/list"
 const val ADMIN_SEARCH_USER_URI         = "/dev-api/vue-element-admin/search/user"
+const val ADMIN_AUTH_CAPTCHA_URI        = "/dev-api/vue-element-admin/auth/captcha"
 const val ADMIN_USER_LOGIN_URI          = "/dev-api/vue-element-admin/user/login"
 const val ADMIN_USER_LOGOUT_URI         = "/dev-api/vue-element-admin/user/logout"
 const val ADMIN_ROLES_URI               = "/dev-api/vue-element-admin/roles"
@@ -52,3 +55,10 @@ const val ADMIN_ARTICLE_LIST            = "/dev-api/vue-element-admin/article/li
 
 const val ADMIN_ROLE_PERM_UPDATE        = "/dev-api/vue-element-admin/role/update"
 const val ADMIN_ROLE_PERM_DELETE        = "/dev-api/vue-element-admin/role/delete"
+
+const val TRACE_TOKEN = "trace_uuid"//see logback.xml
+const val CLIENT_API_PATTERN    = "/oo-srv/api/**"
+const val ADMIN_API_PATTERN     = "/dev-api/vue-element-admin/**"
+
+const val REQ_USER_KEY = "REQ_USER_KEY"
+const val AUTH_CAPTCHA_KEY = "captcha"

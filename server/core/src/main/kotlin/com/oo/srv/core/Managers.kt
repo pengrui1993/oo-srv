@@ -5,7 +5,9 @@ import java.util.*
 val randomCode = {uuid().substring(0,8)}
 
 object InvitingCodeManager:Module{
+    @Final
     private lateinit var invitingCodeRepo:InvitingCodeRepository
+    @Final
     private lateinit var waitressAccessor:WaitressAccessor
     private val listener:EventListener = { it->
         when(it){
@@ -88,10 +90,15 @@ object CustomerManager:Module{
     }
 }
 object OrderManager:Module{
+    @Final
+    private lateinit var orderRepository: OrderRepository
     private val listener:EventListener = { it->
         when(it){
             is SysStartingEvent->{
-                it.setReady(this,true)
+                it.getBean(OrderRepository::class.java).let { bean->
+                    orderRepository = bean
+                    it.setReady(this,true)
+                }
             }
         }
     }

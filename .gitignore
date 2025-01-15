@@ -41,3 +41,4 @@ out/
 
 log/
 docs/core.zip
+*.pid

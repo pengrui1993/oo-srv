@@ -1,15 +1,15 @@
 package com.oo.srv
 
-import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.oo.srv.Api.entries
+import com.oo.srv.AppApi.entries
+import com.oo.srv.core.Roles
 import org.slf4j.LoggerFactory
 
 
 
-enum class Api(val uri:String
-    ,private val rw:Boolean=READ
-    ,val auth:Boolean = false
+enum class AppApi(val uri:String
+                  , private val rw:Boolean=READ
+                  , val auth:Boolean = false
 ) {
      LOGIN(SMS_LOGIN_URI,WRITE)
     ,LOGOUT(LOGOUT_URI,WRITE)
@@ -30,7 +30,7 @@ enum class Api(val uri:String
         return rw == READ;
     }
     companion object{
-        fun from(uri:String):Api{
+        fun from(uri:String):AppApi{
             for (entry in entries) {
                 if(entry.uri==uri)
                     return entry
@@ -40,19 +40,9 @@ enum class Api(val uri:String
 
     }
 }
-private val log = LoggerFactory.getLogger(Api::class.java)
-private val init_ =  object{
-    init{
-        if(entries.map { a->a.uri }.toSet().size!=entries.size){
-            log.warn("same url in api :{}",Api.entries.toList())
-        }
-    }
-}
-private val gson = Gson()
-
 enum class ApiCode(val code:Int,val msg:String){
     OK(200,"成功")
-    ,NO_AUTH(401,"无权限")
+    ,NO_AUTH(401,"无权限|无令牌|令牌过期")
     ,SERVER_ERROR(500,"请联系管理员")
     ;
     fun toJson():String{
@@ -62,11 +52,32 @@ enum class ApiCode(val code:Int,val msg:String){
         return gson.toJson(obj)
     }
 }
+enum class AppRoles{
+    GUEST,WAITRESS,CUSTOMER
+    ;
+    fun toCoreRole(){
+        when(this){
+            GUEST-> Roles.GUEST
+            WAITRESS-> Roles.WAITRESS
+            CUSTOMER-> Roles.CUSTOMER
+        }
+    }
+}
+private val init_ =  object{
+    private val log = LoggerFactory.getLogger(javaClass)
+    init{
+        if(entries.map { a->a.uri }.toSet().size!=entries.size){
+            log.warn("same url in api :{}",AppApi.entries.toList())
+        }
+    }
+}
+
+
 private fun test() {
-    for (entry in Api.entries) {
+    for (entry in AppApi.entries) {
         println(entry)
     }
-    println(Api.LOGIN.uri)
+    println(AppApi.LOGIN.uri)
 }
 
 

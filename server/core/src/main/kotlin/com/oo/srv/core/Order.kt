@@ -151,8 +151,8 @@ open class OnceServing(val id:OrderId,pos:Position)
                 val from = waitressAcceptedPosition!!
                 val current = pos
                 val to = customerCreateOrderPosition
-                val total = haversine(from.first,from.second,to.first,to.second)
-                val now = haversine(from.first,from.second,current.first,current.second)
+                val total = haversine(from,to)
+                val now = haversine(from,current)
                 version++
             }
             else->{

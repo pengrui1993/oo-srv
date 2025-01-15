@@ -43,7 +43,7 @@ private object AuthController {
 
 @RestController
 private object FirstPageController {
-    private val log = LoggerFactory.getLogger(FirstPageController::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     @GetMapping(FIRST_PAGE_CONFIG_URI)
     fun brand():Any{
         return ClassLoader.getSystemResourceAsStream("recentlyStates.json").use {
@@ -120,8 +120,6 @@ private object StoreController {
     }
 }
 
-fun main() {
-}
 @RestController
 private object ActressController {
     //?pageNum=1&pageSize=10&status=1&accountType=1&latitude=&longitude=&jobTitle=%E6%8C%89%E6%91%A9

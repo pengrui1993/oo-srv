@@ -1,12 +1,15 @@
 package com.oo.srv
 
-import com.google.gson.Gson
+import com.wf.captcha.SpecCaptcha
 import jakarta.annotation.Resource
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.*
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.caseSensitive
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -29,68 +32,122 @@ private class AdminTransactionController(@Resource val tranRepo:BizTranRepo){
 }
 
 
-
-interface AdminSessionManager
-@Component
-class AdminSessionManagerImpl:AdminSessionManager{
-}
 @RestController
 class AdminAuthController(
-    @Resource val tokenRepo:SysTokenRepo
-    ,@Resource val roleRepo:SysRoleRepo
+    @Resource val sessionManager:AdminSessionManager
+    ,@Resource val userRepo:SysUserRepo
 ){
+    //ocr-captcha
+    private val log = LoggerFactory.getLogger(javaClass)
+    @GetMapping(ADMIN_AUTH_CAPTCHA_URI)
+    fun captcha(request:HttpServletRequest,response:HttpServletResponse){
+        val captcha = SpecCaptcha(130, 48, 4)
+        response.contentType = "image/gif"
+        response.setHeader("Pragma", "No-cache")
+        response.setHeader("Cache-Control", "no-cache")
+        response.setDateHeader("Expires", 0L)
+        val session = request.getSession(true)
+        val codeTimePair = captcha.text().lowercase(Locale.getDefault()) to LocalDateTime.now().plusMinutes(10)
+        session.setAttribute(AUTH_CAPTCHA_KEY, codeTimePair)
+        captcha.out(response.outputStream)
+    }
     @PostMapping(ADMIN_USER_LOGIN_URI)
-    fun login(@RequestBody body:Map<String,String>):Any{
-        val username = body["username"]
-        val err = {mapOf(
+    fun login(@RequestBody body:Map<String,String>,request:HttpServletRequest):Any{
+        log.info("admin.login:{}",gson.toJson(body))
+        val uname = body["username"]
+        val upwd = body["password"]
+        val code = body["verification"]!!
+        val err = {
+            mapOf(
             "code" to AdminApiCode.AUTH_ERR.code,
             "message" to "Account and password are incorrect.",
         )}
-        if(Objects.isNull(username))return err()
-        val token = roleRepo.findByIdOrNull(username)
-        if(Objects.isNull(token))return err()
+        if(Objects.isNull(uname)||uname!!.isEmpty())return err()
+        if(Objects.isNull(upwd)||upwd!!.isEmpty())return err()
+        val session = request.getSession(false)
+        if(Objects.isNull(session))throw AdminVerificationExpiredException()
+        val cap = session!!.getAttribute(AUTH_CAPTCHA_KEY)
+        if(Objects.isNull(cap))throw AdminVerificationExpiredException()
+        val pair = cap  as Pair<String,LocalDateTime>
+        if(pair.second.isBefore(LocalDateTime.now())) {
+            session.removeAttribute(AUTH_CAPTCHA_KEY)
+            throw AdminVerificationExpiredException()
+        }
+        if(code!=pair.first) throw AdminTokenExpiredException()
+        session.removeAttribute(AUTH_CAPTCHA_KEY)
+        val ex = Example.of(SysUser().clear().also { it.upwd = upwd;it.uname=uname }
+            , ExampleMatcher.matching().withIgnoreNullValues()
+                .withMatcher("uname",caseSensitive())
+                .withMatcher("upwd",caseSensitive())
+        )
+        val res = userRepo.findOne(ex)
+        if(res.isEmpty)return err()
+        val token = sessionManager.createToken(res.get())
+        session.invalidate()
         return mapOf(
             "code" to AdminApiCode.OK.code,
-            "data" to Gson().fromJson(token!!.testToken,HashMap::class.java),
+            "data" to token,
         )
     }
     @PostMapping(ADMIN_USER_LOGOUT_URI)
-    fun logout():Any{
+    fun logout(req:HttpServletRequest):Any{
+        val token = req.getHeader(ADMIN_AUTH_KEY)
+        sessionManager.destroyToken(token!!)
         return mapOf(
             "code" to AdminApiCode.OK.code,
             "data" to "success",
         )
     }
+
+    private val usersRoles = lazy {
+        ClassLoader.getSystemResourceAsStream("users.json")
+            .use {gson.fromJson(readInputStreamAsString(it!!),HashMap::class.java) as Map<String,*>}
+    }
     @GetMapping(ADMIN_USER_INFO_URI)
-    fun userInfo(@RequestParam token:String):Any{
+    fun userRoles(
+//        @RequestParam token:String
+        req:HttpServletRequest
+    ):Any{
+        val user = req.getAttribute(REQ_USER_KEY) as SysUser
         val err = {mapOf(
             "code" to AdminApiCode.ILLEGAL_TOKEN.code,
             "message" to "Login failed, unable to get user details.",
         )}
-        val info = tokenRepo.findByIdOrNull(token)
+        val info = usersRoles.value[user.role]
         if(Objects.isNull(info))return err()
         return mapOf(
             "code" to AdminApiCode.OK.code,
-            "data" to Gson().fromJson(info!!.data,HashMap::class.java),
+            "data" to info,
         )
     }
 }
 
 @RestController
-object AdminRouterController{
+private object AdminRouterController{
+    val allRouters = lazy {
+        ClassLoader.getSystemResourceAsStream("routers.json")
+            .use {readInputStreamAsString(it!!).let {routers-> gson.fromJson(routers,List::class.java) }}
+    }
     @GetMapping(ADMIN_ROUTERS_URI)
     fun routers():Any{
-        return ClassLoader.getSystemResourceAsStream("routersList.json")
-            .use {readInputStreamAsString(it!!)}
+        return mapOf(
+            "code" to AdminApiCode.OK.code
+            ,"data" to allRouters.value
+        )
     }
 }
 @RestController
 private class AdminRoleController(@Resource  val repo:BizApiCallRepository){
-
+    val roleRouters = lazy {
+        ClassLoader.getSystemResourceAsStream("roleRouters.json")
+            .use {readInputStreamAsString(it!!).let {rolesRouters-> gson.fromJson(rolesRouters,List::class.java) }}
+    }
     @GetMapping(ADMIN_ROLES_URI)
-    fun roles():Any{
-        return ClassLoader.getSystemResourceAsStream("roleRouters.json")
-            .use {readInputStreamAsString(it!!)}
+    fun rolesRouters():Any{
+        return mapOf(
+            "code" to AdminApiCode.OK.code
+            ,"data" to roleRouters.value
+        )
     }
     @PostMapping("/dev-api/vue-element-admin/role/add")
     fun add(){

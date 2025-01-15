@@ -1,6 +1,5 @@
 package com.oo.srv
 
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -63,7 +62,7 @@ fun powerToRouter(p:SysPowerToRouter, idToPower:Map<Long,SysPowerToRouter>):VueR
         if(it.name.startsWith("meta")){
             val ss = it.name.split("meta")[1]
             val routerMetaName = ss[0].lowercase(Locale.getDefault())+ss.substring(1)
-            mm[routerMetaName]?.let  l1@{ metaField->
+            mm[routerMetaName]?.let l1@{ metaField->
                 if(routerMetaName=="roles"){
                     it.isAccessible = true
                     val listStr = it.get(p) ?: return@l1;
@@ -152,7 +151,6 @@ private fun parseRoutersToSysPowerList(){
     val msg = ClassLoader.getSystemResourceAsStream("routers.json").use{
         readInputStreamAsString(it!!)
     }
-    val gson = Gson()
     val root = gson.fromJson(msg, JsonElement::class.java)
     val queue = LinkedList<JsonElement>()
     val gen = mutableMapOf<Long,SysPowerToRouter>()
@@ -229,7 +227,6 @@ private fun takeKeys() {
     val msg = ClassLoader.getSystemResourceAsStream("routers.json").use{
         readInputStreamAsString(it!!)
     }
-    val gson = Gson()
     val root = gson.fromJson(msg, JsonElement::class.java)
     val queue = LinkedList<JsonElement>()
     queue.push(root)
@@ -255,14 +252,14 @@ private fun takeKeys() {
 }
 private fun templateField(){
     val msg = "[path, redirect, hidden, component, children,  name, alwaysShow    ,meta,title,icon,noCache, roles, affix]"
-    Gson().fromJson(msg, JsonArray::class.java).forEach {
+    gson.fromJson(msg, JsonArray::class.java).forEach {
         val f = it.asString
         println(String.format("val %s = obj.get(\"%s\")",f,f))
     }
 }
 private fun templateBuilder(){
     val msg = "[path, redirect, hidden, component, children,  name, alwaysShow    ,meta,title,icon,noCache, roles, affix]"
-    Gson().fromJson(msg, JsonArray::class.java).forEach {
+    gson.fromJson(msg, JsonArray::class.java).forEach {
         val f = it.asString
         println(String.format("if(null!=%s)builder.append(%s).append(' ')",f,f))
     }

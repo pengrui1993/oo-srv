@@ -1,6 +1,5 @@
 package com.oo.srv
 
-import com.google.gson.Gson
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.ValidationException
@@ -18,41 +17,42 @@ import org.springframework.web.servlet.NoHandlerFoundException
 
 @RestControllerAdvice
 private object GlobalExceptionHandler {
-    private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
-    private fun defaultHandle(ex: Throwable):Any{
+    private val log = LoggerFactory.getLogger(javaClass)
+    private fun defaultApiHandle(ex: Throwable, ac:ApiCode = ApiCode.SERVER_ERROR):Any{
         log.error(ex.message,ex)
         return mapOf(
-            "code" to ApiCode.SERVER_ERROR.code
-            ,"msg" to ApiCode.SERVER_ERROR.msg
+            "code" to ac.code
+            ,"msg" to ac.msg
             ,"trace" to traceToken()
         )
     }
-    private fun defaultAdminHandler(ex:Throwable):Any{
+    private fun defaultAdminHandler(ex:Throwable,aac:AdminApiCode = AdminApiCode.SERVER_ERROR):Any{
         log.error(ex.message,ex)
         return mapOf(
-            "code" to AdminApiCode.SERVER_ERROR.code
-            ,"msg" to AdminApiCode.SERVER_ERROR.msg
+            "code" to aac.code
+            ,"message" to aac.msg
             ,"trace" to traceToken()
         )
+
     }
     /**
      * 处理系统异常，兜底处理所有的一切
      */
     @ExceptionHandler(value = [Throwable::class])
     fun defaultExceptionHandler(req: HttpServletRequest,ex: Throwable): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     @ExceptionHandler(value = [RuntimeException::class])
     fun unknownRuntimeException(ex: RuntimeException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     @ExceptionHandler(value = [IllegalArgumentException::class])
     fun illegalArgumentException(ex: IllegalArgumentException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     @ExceptionHandler(MultipartException::class)
     fun fileUploadExceptionHandler(ex: MultipartException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 SpringMVC 请求参数缺失
@@ -60,7 +60,7 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(value = [MissingServletRequestParameterException::class])
     fun missingServletRequestParameterExceptionHandler(ex: MissingServletRequestParameterException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 SpringMVC 请求参数类型错误
@@ -68,7 +68,7 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun methodArgumentTypeMismatchExceptionHandler(ex: MethodArgumentTypeMismatchException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
 
     /**
@@ -76,14 +76,14 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun methodArgumentNotValidExceptionExceptionHandler(ex: MethodArgumentNotValidException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 SpringMVC 参数绑定不正确，本质上也是通过 Validator 校验
      */
     @ExceptionHandler(BindException::class)
     fun bindExceptionHandler(ex: BindException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 Validator 校验不通过产生的异常
@@ -91,7 +91,7 @@ private object GlobalExceptionHandler {
     @ExceptionHandler(value = [ConstraintViolationException::class])
     fun constraintViolationExceptionHandler(ex: ConstraintViolationException): Any {
         val constraintViolation = ex.constraintViolations.iterator().next()
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 Dubbo Consumer 本地参数校验时，抛出的 ValidationException 异常
@@ -99,7 +99,7 @@ private object GlobalExceptionHandler {
     @ExceptionHandler(value = [ValidationException::class])
     fun validationException(ex: ValidationException): Any {
         // 无法拼接明细的错误信息，因为 Dubbo Consumer 抛出 ValidationException 异常时，是直接的字符串信息，且人类不可读
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
 
     /**
@@ -110,7 +110,7 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException::class)
     fun noHandlerFoundExceptionHandler(req: HttpServletRequest, ex: NoHandlerFoundException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
     /**
      * 处理 SpringMVC 请求方法不正确
@@ -118,7 +118,7 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     fun httpRequestMethodNotSupportedExceptionHandler(ex: HttpRequestMethodNotSupportedException): Any {
-        return defaultHandle(ex)
+        return defaultApiHandle(ex)
     }
 
     /**
@@ -126,24 +126,24 @@ private object GlobalExceptionHandler {
      */
     @ExceptionHandler(value = [AdminAuthenticationException::class])
     fun accessDeniedExceptionHandler(req: HttpServletRequest, ex: AdminAuthenticationException): Any {
-        log.error(ex.message,ex)
-        return mapOf(
-            "code" to AdminApiCode.AUTH_ERR
-            ,"msg" to AdminApiCode.AUTH_ERR.msg
-            ,"trace" to traceToken()
-        )
+        return defaultAdminHandler(ex,AdminApiCode.AUTH_ERR)
     }
+    @ExceptionHandler(value = [AdminTokenExpiredException::class])
+    fun accessDeniedExceptionHandler(req: HttpServletRequest, ex: AdminTokenExpiredException): Any {
+        return defaultAdminHandler(ex,AdminApiCode.TOKEN_EXPIRED)
+    }
+
+    @ExceptionHandler(value = [AdminVerificationExpiredException::class])
+    fun verifyCodeExpired(req: HttpServletRequest, ex: AdminVerificationExpiredException): Any {
+        return defaultAdminHandler(ex,AdminApiCode.VER_CODE_EXPIRED)
+    }
+
     /**
      * 处理 Spring Security 权限不足的异常
      */
     @ExceptionHandler(value = [AuthenticationException::class])
     fun accessDeniedExceptionHandler(req: HttpServletRequest, ex: AuthenticationException): Any {
-        log.error(ex.message,ex)
-        return mapOf(
-            "code" to ApiCode.NO_AUTH.code
-            ,"msg" to ApiCode.NO_AUTH.msg
-            ,"trace" to traceToken()
-        )
+        return defaultApiHandle(ex,ApiCode.NO_AUTH)
     }
     /**
      * 处理业务异常 ServiceException
@@ -158,7 +158,9 @@ private object GlobalExceptionHandler {
             ,"trace" to traceToken()
         )
     }
-
-
+    @ExceptionHandler(value = [AdminBusinessException::class])
+    fun serviceExceptionHandler(ex: AdminBusinessException): Any {
+        return defaultAdminHandler(ex)
+    }
 }
 

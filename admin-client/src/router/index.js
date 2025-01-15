@@ -189,7 +189,7 @@ export const asyncRoutes = [
   chartsRouter,
   nestedRouter,
   tableRouter,
-
+  /*
   {
     path: '/example',
     component: Layout,
@@ -221,7 +221,7 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  */
   {
     path: '/tab',
     component: Layout,

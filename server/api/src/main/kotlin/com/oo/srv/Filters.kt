@@ -1,8 +1,5 @@
 package com.oo.srv
 
-import com.oo.srv.core.Roles
-import jakarta.annotation.Resource
-import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.annotation.WebFilter
 import jakarta.servlet.http.HttpServletRequest
@@ -13,21 +10,18 @@ import org.slf4j.MDC
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import java.util.*
 
 
-
-private const val TRACE_TOKEN: String = "trace_uuid"
 fun traceToken():String?{
     return MDC.get(TRACE_TOKEN)
 }
 @Component
 @WebFilter(urlPatterns = ["/**"])
 @Order(Int.MAX_VALUE/2)
-internal class TraceFilter :OncePerRequestFilter(){
+private class TraceFilter :OncePerRequestFilter(){
     private fun enableTrace() {
         if (StringUtils.isBlank(traceToken())) {
-            MDC.put(TRACE_TOKEN, UUID.randomUUID().toString().replace("-", ""))
+            MDC.put(TRACE_TOKEN, uuid())
         }
     }
     private fun disableTrace() {
@@ -51,7 +45,7 @@ private fun now():Long{return System.currentTimeMillis()}
 @WebFilter(urlPatterns = ["/**"])
 @Order(Int.MAX_VALUE/2+100)
 private class LogFilter :OncePerRequestFilter(){
-    private val log = LoggerFactory.getLogger(LogFilter::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun initFilterBean() {
         super.initFilterBean()
     }

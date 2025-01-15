@@ -159,7 +159,7 @@ class Storage(
     ,@Resource val propertiesAccessor: PropertiesAccessor
 
 ){
-    private val log = LoggerFactory.getLogger(Storage::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     fun read(id: Long): UploadFileInfo? {
         return fileRepository.findByIdOrNull(id)
     }

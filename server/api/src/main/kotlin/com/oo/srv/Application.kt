@@ -57,7 +57,7 @@ private class HelloController{
 object Syncer{
     private val creator = Thread.currentThread()
     private val queue = LinkedBlockingQueue<()->Unit>()
-    private val log = LoggerFactory.getLogger(Syncer::class.java)
+    private val log = LoggerFactory.getLogger(javaClass)
     private val worker = Thread{
         while(true){
             try{
@@ -84,15 +84,19 @@ interface PropertiesAccessor{
     val localUploadedPath:String
     val urlPrefix:String
     val serverOrigin:String
+    val debug:Boolean
 }
 @Component
 class ApplicationProperties(
      @Value("\${sys.origin:http://habf.com}")
      var origin:String
-    ,@Value("\${sys.uploaded.url.path.prefix:/oo-srv/static/upload}") //TODO nginx 配置
+     //url: http://habf.com/oo-srv/static/20230303/abc.jpg
+     ,@Value("\${sys.uploaded.url.path.prefix:/oo-srv/static}") //TODO nginx 配置
      var uploadedFilesUrlPathPrefix:String
-    ,@Value("\${sys.disk.upload.location:/home/user/data/static/upload}")
+     ,@Value("\${sys.disk.upload.location:/tmp/static}")
      var uploadedFilesPathPosition:String
+     ,@Value("\${sys.debug:true}")
+     var isDebug:Boolean
 ):ApplicationListener<ApplicationEvent> ,PropertiesAccessor{
     override val localUploadedPath: String
         get() = uploadedFilesPathPosition
@@ -100,7 +104,9 @@ class ApplicationProperties(
         get() = uploadedFilesUrlPathPrefix
     override val serverOrigin: String
         get() = origin
-    private val log = LoggerFactory.getLogger(ApplicationProperties::class.java)
+    override val debug: Boolean
+        get() = isDebug
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun onApplicationEvent(event: ApplicationEvent) {
         when(event){
             is ApplicationStartedEvent->{

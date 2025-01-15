@@ -1,6 +1,7 @@
 package com.oo.srv
 
 import com.oo.srv.core.InvitingCodeRepository
+import com.oo.srv.core.OrderRepository
 import com.oo.srv.core.WaitressRepository
 import jakarta.annotation.Resource
 import jakarta.persistence.EntityManager
@@ -30,19 +31,26 @@ interface BizApiCallRepository:ParentRepository<BizApiCall,Long>{
 interface SysApiCallRepo:ParentRepository<SysApiCall,Long>
 @Repository
 interface BizTranRepo:ParentRepository<BizTransaction,String>
+//@Repository
+//interface SysTokenRepo:ParentRepository<SysToken,String>
 @Repository
-interface SysTokenRepo:ParentRepository<SysToken,String>
-@Repository
-interface SysRoleRepo:ParentRepository<SysRole,String>
-@Repository
-interface SysPowerRepo:ParentRepository<SysPower,Long>
-@Repository
-interface SysRolePowersRepo:ParentRepository<SysRolePowers,Long>
+interface SysUserRepo:ParentRepository<SysUser,String>
+
+//@Repository
+//interface SysRoleRepo:ParentRepository<SysRole,String>
+//@Repository
+//interface SysPowerRepo:ParentRepository<SysPower,Long>
+//@Repository
+//interface SysRolePowersRepo:ParentRepository<SysRolePowers,Long>
 @Repository
 interface UploadFileInfoRepo:ParentRepository<UploadFileInfo,Long>
 @Repository
-interface WaitressRepo:ParentRepository<BizApiCall,Long>//TODO
+interface WaitressRepo:ParentRepository<ActressUser,Long>//TODO
 
+
+
+@Component
+class OrderRepositoryImpl: OrderRepository
 @Component
 class InvitingCodeRepositoryImpl: InvitingCodeRepository
 @Component

@@ -6,20 +6,12 @@ import org.apache.tika.config.TikaConfig
 import org.apache.tika.io.TikaInputStream
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.Comment
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.event.ApplicationStartedEvent
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationListener
-import org.springframework.stereotype.Component
-import org.springframework.stereotype.Repository
-import java.io.File
 import java.math.BigDecimal
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 
 
 open class CallValues{
@@ -100,7 +92,7 @@ class SysApiCall:CallValues(){
 @Entity
 @Table(name="biz_proc")
 @Comment("procedure")
-class BizProcedure(val creator:Long = 0L){
+class BizProcedure(var creator:Long = 0L){
     @Id
     var id = uuid()
     var type = 0 //Procedure.Type like audit
@@ -119,9 +111,7 @@ class BizProcedure(val creator:Long = 0L){
         const val FALSE = 0.toByte()
     }
 }
-fun uuid():String{
-    return UUID.randomUUID().toString().replace("-","")
-}
+
 @Entity
 @Table(name="biz_tran")
 class BizTransaction{
@@ -134,8 +124,8 @@ class BizTransaction{
     var timestamp = 0L
     var version = 0
 }
-@Entity
-@Table(name="sys_token")
+//@Entity
+//@Table(name="sys_token")
 class SysToken{
     @Id
     var token = "admin-token"
@@ -152,6 +142,7 @@ class SysToken{
 @Table(name="sys_config")
 class SysConfig{
     @Id
+    @GeneratedValue()
     var key = ""
     var cfgGroup = ""
     var pattern = ""
@@ -160,19 +151,30 @@ class SysConfig{
 }
 @Entity
 @Table(name="sys_user")
-class SysUser{
+class SysUser:AdminUserInfo{
     @Id
-    var id = 0L
-    var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
-    var name = "Super Admin"
-    var role = "admin"
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id:Long? = null
+    var avatar:String? = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    var uname:String? = ""
+    var upwd:String? = ""
+    var name:String? = ""
+    var role:String? = ""
+    var curToken:String? = null
+    fun clear():SysUser{
+        SysUser::class.java.declaredFields.forEach {
+            it.isAccessible=true
+            it.set(this,null)
+        }
+        return this
+    }
 }
 
-@Entity
-@Table(name="sys_role_powers", indexes = [
-    Index(name = "role_index_name",  columnList="role", unique = false)
-    ,Index(name = "power_index_name",  columnList="power", unique = false)
-])
+//@Entity
+//@Table(name="sys_role_powers", indexes = [
+//    Index(name = "role_index_name",  columnList="role", unique = false)
+//    ,Index(name = "power_index_name",  columnList="power", unique = false)
+//])
 class SysRolePowers{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -183,8 +185,8 @@ class SysRolePowers{
     val power = 0L
     val powerType = "MENU|PAGE|API"
 }
-@Entity
-@Table(name="sys_role")
+//@Entity
+//@Table(name="sys_role")
 class SysRole{
     @Id
     var role = "admin"
@@ -192,8 +194,8 @@ class SysRole{
     var introduction = "I am a super administrator"
     val createTime = LocalDateTime.now()
 }
-@Entity
-@Table(name="sys_power")
+//@Entity
+//@Table(name="sys_power")
 class SysPower(initId:Long = 0, initPid:Long = 0){
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
