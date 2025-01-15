@@ -1,4 +1,7 @@
 package com.oo.srv
+import com.oo.srv.core.BeanManager
+import com.oo.srv.core.coreDestroy
+import com.oo.srv.core.coreInit
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
@@ -7,7 +10,6 @@ import org.springframework.boot.availability.AvailabilityChangeEvent
 import org.springframework.boot.context.ApplicationPidFileWriter
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.context.event.ApplicationStartedEvent
-import org.springframework.boot.context.event.SpringApplicationEvent
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.servlet.ServletComponentScan
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent
@@ -15,7 +17,6 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.event.ContextRefreshedEvent
-import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -28,13 +29,21 @@ import java.util.concurrent.ThreadLocalRandom
 class Application
 lateinit var ctx:ConfigurableApplicationContext
 lateinit var app:SpringApplication
+private lateinit var forCore:BeanManager
 fun start(vararg args:String):()->Unit{
     ctx = runApplication<Application>(*args,init = {
         app = this
         addListeners(ApplicationPidFileWriter())
     })
-    return {ctx.stop()}
+    forCore = object:BeanManager{
+        override fun <T> getBean(clazz: Class<T>): T {
+            return ctx.getBean(clazz)
+        }
+    }
+    coreInit(forCore)
+    return {coreDestroy(forCore);ctx.stop()}
 }
+fun stop(){}
 @RestController
 private class HelloController{
     @GetMapping("/")

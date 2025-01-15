@@ -1,0 +1,16 @@
+{
+  "code": 200,
+  "rows": [
+    {
+      "id": 68,
+      "age": 22,
+      "isAuth": "1",
+      "nickName": "倩敏",
+      "jobTitle": "按摩",
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2023/02/11/20230211154906A054.jpg",
+      "totalOrder": 29,
+      "distance": 11975.71,
+      "storeName": "健养汇养生馆（龙华店）"
+    }
+  ]
+}

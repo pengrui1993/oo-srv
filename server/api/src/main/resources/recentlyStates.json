@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "rows": [
+    {
+      "id": 150,
+      "storeId": 19,
+      "content": "美妙的一天",
+      "imgUrl": "https://image.xfdj.kft.ink/profile/upload/2024/03/06/20240306213439A001.jpeg",
+      "longitude": 114.059468,
+      "latitude": 22.621726,
+      "visitedTimes": 107,
+      "viewNum": 107,
+      "likeNum": 0,
+      "dynamicType": "1",
+      "createTime": "2024-03-06 21:36:18",
+      "actressId": 71,
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2023/06/07/20230607100032A002.jpeg",
+      "storeName": "健健养生馆"
+    }
+  ]
+}

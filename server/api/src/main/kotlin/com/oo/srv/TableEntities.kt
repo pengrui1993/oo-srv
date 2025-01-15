@@ -153,7 +153,7 @@ class SysToken{
 class SysConfig{
     @Id
     var key = ""
-    var group = ""
+    var cfgGroup = ""
     var pattern = ""
     @Column(columnDefinition = "TEXT")
     var value = ""
@@ -165,7 +165,7 @@ class SysUser{
     var id = 0L
     var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
     var name = "Super Admin"
-    var rid = "admin"
+    var role = "admin"
 }
 
 @Entity
@@ -247,7 +247,6 @@ class UploadFileInfo{
     }
 }
 
-
 typealias Meta = org.apache.tika.metadata.Metadata
 fun demoForTestMime() {
     val tika = TikaConfig()
@@ -276,4 +275,59 @@ fun demoForTestMime() {
             println("Stream $`is` is $mimetype")
         }
     }
+}
+@Entity
+@Table(name="biz_payment")
+class BizPayment{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id = 0L
+    var type = 0
+}
+@Entity
+@Table(name="biz_order")
+class BizOrder{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id = 0L
+    var state = 0
+    var type = 0
+    var paymentId = 0L
+    var version = 0
+}
+@Entity
+@Table(name="biz_user")
+class BizUser{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id = 0L
+    var name = "Super Admin"
+    var phone = "13333333333"
+    var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    var openId = "234432"
+    var roleCustomer = 0
+    var roleActress = 0
+}
+@Entity
+@Table(name="biz_csm_user")
+class CustomerUser{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id = 0L
+    var name = "Super Admin"
+    var phone = "13333333333"
+    var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    var openId = "234432"
+}
+@Entity
+@Table(name="biz_act_user")
+class ActressUser{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id = 0L
+    var name = "Super Admin"
+    var phone = "13333333333"
+    var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    var openId = "234432"
+    var gender = "female"
 }

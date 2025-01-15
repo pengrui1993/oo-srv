@@ -14,7 +14,8 @@ interface OnceServingOnTickCallback{
     fun onPayTimeout(ctx:OnceServingOnTickContext)
     fun onWaitressAcceptingTimeout(onceServing: OnceServingOnTickContext)
 }
-class OnceServing(val id:Long,pos:Position)
+
+open class OnceServing(val id:OrderId,pos:Position)
     :OnceServingPaybackContext
     ,OnceServingOnTickContext{
     enum class FlowState{
@@ -166,7 +167,7 @@ class OnceServing(val id:Long,pos:Position)
         if(wts!=waitress)return
         when(FlowState.from(flowState)){
             FlowState.CUSTOMER_PAY_DONE->{
-                //不可力扛原因取消 轻度惩罚并记录
+                //不可力抗原因取消 轻度惩罚并记录
             }
             FlowState.WAITRESS_ACCEPTED->{
                 flowState = FlowState.WAITRESS_CANCEL_ORDER_WHEN_ARRIVED.ordinal

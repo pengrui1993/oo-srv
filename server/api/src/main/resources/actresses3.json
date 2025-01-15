@@ -1,0 +1,26 @@
+{
+  "code": 200,
+  "count": 3,
+  "rows": [
+    {
+      "id": 72,
+      "nickName": "青春",
+      "mobile": "137xxxx5847",
+      "jobTitle": "按摩",
+      "distance": 11969.95,
+      "storeId": 73,
+      "mustStatus": true,
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2024/03/04/20240304214647A002.jpeg"
+    },
+    {
+      "id": 59,
+      "nickName": "芳芳",
+      "mobile": "188xxxx8587",
+      "jobTitle": "按摩",
+      "distance": 11977.29,
+      "storeId": 38,
+      "mustStatus": true,
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2023/02/11/20230211145621A018.jpg"
+    }
+  ]
+}

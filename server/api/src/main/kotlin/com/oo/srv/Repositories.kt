@@ -1,5 +1,6 @@
 package com.oo.srv
 
+import com.oo.srv.core.InvitingCodeRepository
 import com.oo.srv.core.WaitressRepository
 import jakarta.annotation.Resource
 import jakarta.persistence.EntityManager
@@ -13,30 +14,37 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDateTime
 
 
 @NoRepositoryBean
 interface ParentRepository<T, ID> : JpaRepository<T, ID>, PagingAndSortingRepository<T, ID>
-
-@Repository
-interface BizTranRepository:ParentRepository<BizTransaction,String>
-@Repository
-interface SysTokenRepository:ParentRepository<SysToken,String>
-@Repository
-interface SysRoleRepository:ParentRepository<SysRole,String>
-@Repository
-interface SysPowerRepository:ParentRepository<SysPower,Long>
-@Repository
-interface SysRolePowersRepository:ParentRepository<SysRolePowers,Long>
 @Repository
 interface BizApiCallRepository:ParentRepository<BizApiCall,Long>{
     //https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
     fun findByIdIn(ages: Collection<Long>): List<BizApiCall>
+    fun findByStartTimeGreaterThanAndEndTimeLessThan(t1:LocalDateTime,t2:LocalDateTime):List<BizApiCall>
 }
 @Repository
-interface WaitressRepo:ParentRepository<BizApiCall,Long>
+interface SysApiCallRepo:ParentRepository<SysApiCall,Long>
+@Repository
+interface BizTranRepo:ParentRepository<BizTransaction,String>
+@Repository
+interface SysTokenRepo:ParentRepository<SysToken,String>
+@Repository
+interface SysRoleRepo:ParentRepository<SysRole,String>
+@Repository
+interface SysPowerRepo:ParentRepository<SysPower,Long>
+@Repository
+interface SysRolePowersRepo:ParentRepository<SysRolePowers,Long>
 @Repository
 interface UploadFileInfoRepo:ParentRepository<UploadFileInfo,Long>
+@Repository
+interface WaitressRepo:ParentRepository<BizApiCall,Long>//TODO
+
+@Component
+class InvitingCodeRepositoryImpl: InvitingCodeRepository
 @Component
 class WaitressRepositoryImpl(
     @Resource private val repo:WaitressRepo
@@ -45,12 +53,13 @@ class WaitressRepositoryImpl(
 }
 //https://docs.spring.io/spring-data/jpa/reference/repositories/query-by-example.html
 fun findByExample(repo:BizApiCallRepository){
+    val bean = BizApiCall().also{it.version++}
     val match = ExampleMatcher.matching().withIgnoreNullValues()
-    val ex = Example.of(BizApiCall().also{
-        it.version++
-    },match)
-    val sort = Sort.by(Sort.Order.asc("cost"))
+    val ex = Example.of(bean,match)
+    val sort = Sort.by(Sort.Order.asc("cost"),Sort.Order.desc("createTime"))
     val res = repo.findAll(ex,sort)
+    repo.findBy(ex){
+    }
 }
 fun useJdbc(mgr: EntityManager){
     val session: Session = mgr.unwrap(Session::class.java)
@@ -72,4 +81,6 @@ class DemoService{
     @Resource
     @PersistenceContext
     private lateinit var entityManager: EntityManager
+    @Resource
+    private lateinit var transactionTemplate: TransactionTemplate
 }

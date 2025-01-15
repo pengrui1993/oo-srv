@@ -15,6 +15,5 @@ data class CustomerAppraiseWaitress(
     ,val timePoint:TimePoint
 ){
 
-
 }
 class CustomersAddress{}

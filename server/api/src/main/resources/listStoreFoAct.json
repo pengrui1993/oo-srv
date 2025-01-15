@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "rows": [
+    {
+      "id": 19,
+      "storeName": "健健养生馆",
+      "storeDesc": "健健养生馆",
+      "mainImg": "https://image.xfdj.kft.ink/profile/upload/2023/06/26/20230626081429A001.jpeg",
+      "status": "0",
+      "accountId": 75,
+      "serviceTime": "00 to00-23 to59",
+      "address": "广东省深圳市龙岗区龙翔大道8033号",
+      "addressDetail": "深圳市龙岗区人民政府",
+      "longitude": "22.720828",
+      "latitude": "22.720828",
+      "tel": "13510733365",
+      "storeType": "1",
+      "mobile": "135xxxx3365"
+    }
+  ]
+}

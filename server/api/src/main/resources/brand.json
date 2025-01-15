@@ -1,0 +1,15 @@
+{
+  "code": 200,
+  "rows": [
+    {
+      "id": 2,
+      "position": "1",
+      "title": "保健按摩精油开背",
+      "imgUrl": "https://image.xfdj.kft.ink/profile/upload/2023/01/07/20230107143256A056.jpg",
+      "linkUrl": "https://app.xfdj.kft.ink/pages/technicianDetail/technicianDetail?id\u003d68",
+      "linkType": "INNER_PAGE",
+      "sortOrder": "2",
+      "status": "0"
+    }
+  ]
+}

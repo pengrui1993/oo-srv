@@ -1,0 +1,19 @@
+{
+  "code": 200,
+  "count": 10,
+  "rows": [
+    {
+      "id": 72,
+      "nickName": "青春",
+      "mobile": "137xxxx5847",
+      "jobTitle": "按摩",
+      "address": "广东省深圳市龙岗区",
+      "longitude": "114.130271",
+      "latitude": "22.700883",
+      "distance": 11969.95,
+      "storeId": 73,
+      "mustStatus": true,
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2024/03/04/20240304214647A002.jpeg"
+    }
+  ]
+}

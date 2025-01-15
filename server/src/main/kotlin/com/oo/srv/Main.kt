@@ -4,7 +4,13 @@ import kotlin.system.exitProcess
 
 
 fun main(args: Array<String>) {
-    val stopper = start(*args)
+    val stopper:()->Unit
+    try{
+        stopper= start(*args)
+    }catch (e:Throwable){
+        e.printStackTrace()
+        exitProcess(-1)
+    }
     var line: String
     while(true){
         line = readln().trim()
@@ -18,5 +24,4 @@ fun main(args: Array<String>) {
             }
         }
     }
-
 }

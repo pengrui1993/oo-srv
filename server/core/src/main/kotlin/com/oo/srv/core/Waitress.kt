@@ -1,37 +1,32 @@
 package com.oo.srv.core
 
 import java.math.BigDecimal
+import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.util.*
 
 
-private fun customerSearching(lat:Double,lng:Double,type:String){
-    val sql = """
-        SELECT*
-        ,ROUND(6378.138 * 2 * ASIN(SQRT(POW(SIN((#{lat} * PI() / 180 - lat * PI() / 180) / 2),2) + COS(40.0497810000 * PI() / 180) * COS(lat * PI() / 180) * POW(SIN((#{lon} * PI() / 180 - lng * PI() / 180) / 2),2))) * 1000) 
-            AS dis
-        FROM user_waitress 
-        WHERE deleted=0 
-            and serving_type like concat('%,',#{type},',%') 
-            ORDER BY dis ASC searching_score DESC
-            limit 10
-    """.trimIndent()
-}
-object WaitressManager{
-
-}
-
-fun main() {
+private fun numbers() {
     val res = BigDecimal("1234E+2") * BigDecimal("12555.12312")
     println(res.toPlainString())
     println(res.toEngineeringString())
     println(res.toString())
+
+    println(DayOfWeek.of(7))
 }
-class WaitressCurrentState(val id:WaitressId):Waitress{
+open class WaitressCurrentState(val id:WaitressId){
     private var version = 0
     private var inServing = false
     private var canCashOut = false
     private var canServing = false
     private var bankAccount:String? = null
     private var lastCashOutErrorInfo:String? = null
+    private var lastCashOutTime:LocalDateTime? = null
+
+    private var todayCashOutTimes = 0
+    private var weekCalcStartTime:LocalDateTime? = null
+    private var thisWeekCashOutTimes = 0
+
     private var feePercent = 0.5
     private var remainFee = BigDecimal.ZERO
     private var takeOutFee =  BigDecimal.ZERO
@@ -42,7 +37,6 @@ class WaitressCurrentState(val id:WaitressId):Waitress{
     private var raiseTimes = 0
 
     val canTakeOut:Double get() = remainFee.toDouble()
-
     fun onOnceServicingDone(amount:BigDecimal,fireRaise:(WaitressId)->Unit){
         if(raiseTimes>0){
             raiseTimes--
@@ -54,10 +48,31 @@ class WaitressCurrentState(val id:WaitressId):Waitress{
         version++
 
     }
-    fun onCashOutOk(amount:BigDecimal){
+    fun onCashOutError(errInfo:String){
+        canCashOut = false
+        lastCashOutErrorInfo = errInfo
+        version++
+    }
+    fun onCashOutSuccess(amount:BigDecimal,time:LocalDateTime){
         if(amount>remainFee)throw IllegalStateException()
+        lastCashOutErrorInfo = null
         remainFee-=amount
         takeOutFee+=amount
+        if(Objects.isNull(lastCashOutTime)){
+            todayCashOutTimes = 1
+        }
+        lastCashOutTime = time
+        if(Objects.isNull(weekCalcStartTime)){
+            weekCalcStartTime = time
+            thisWeekCashOutTimes = 1
+        }else{
+            if(time.second-weekCalcStartTime!!.second>7*24*60*60){
+                thisWeekCashOutTimes = 1
+                weekCalcStartTime = time
+            }else{
+                thisWeekCashOutTimes++
+            }
+        }
         version++
     }
     val busy get() = inServing
@@ -71,10 +86,7 @@ class WaitressCurrentState(val id:WaitressId):Waitress{
         inServing = false
         version++
     }
-    fun onCashOutSuccess(){
-        lastCashOutErrorInfo = null
-        version++
-    }
+
     fun onSelfBindBankAccount(account:String){
         bankAccount = account
         canCashOut = true
@@ -87,9 +99,5 @@ class WaitressCurrentState(val id:WaitressId):Waitress{
         }
         version++
     }
-    fun onCashOutError(errInfo:String){
-        canCashOut = false
-        lastCashOutErrorInfo = errInfo
-        version++
-    }
+
 }

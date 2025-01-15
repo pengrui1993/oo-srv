@@ -2,20 +2,15 @@ package com.oo.srv
 
 import com.google.gson.Gson
 import jakarta.annotation.Resource
-import jakarta.persistence.*
 import jakarta.validation.Valid
-import org.hibernate.annotations.Comment
 import org.springframework.data.domain.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
-import java.math.BigDecimal
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 
 @RestController
-private class AdminTransactionController(@Resource val tranRepo:BizTranRepository){
+private class AdminTransactionController(@Resource val tranRepo:BizTranRepo){
     @GetMapping(ADMIN_TRANSACTION_LIST_URI)
     fun list():Any{
         return mapOf(
@@ -41,8 +36,8 @@ class AdminSessionManagerImpl:AdminSessionManager{
 }
 @RestController
 class AdminAuthController(
-    @Resource val tokenRepo:SysTokenRepository
-    ,@Resource val roleRepo:SysRoleRepository
+    @Resource val tokenRepo:SysTokenRepo
+    ,@Resource val roleRepo:SysRoleRepo
 ){
     @PostMapping(ADMIN_USER_LOGIN_URI)
     fun login(@RequestBody body:Map<String,String>):Any{
@@ -85,7 +80,8 @@ class AdminAuthController(
 object AdminRouterController{
     @GetMapping(ADMIN_ROUTERS_URI)
     fun routers():Any{
-        return routersList
+        return ClassLoader.getSystemResourceAsStream("routersList.json")
+            .use {readInputStreamAsString(it!!)}
     }
 }
 @RestController
@@ -93,7 +89,8 @@ private class AdminRoleController(@Resource  val repo:BizApiCallRepository){
 
     @GetMapping(ADMIN_ROLES_URI)
     fun roles():Any{
-        return roleRouters
+        return ClassLoader.getSystemResourceAsStream("roleRouters.json")
+            .use {readInputStreamAsString(it!!)}
     }
     @PostMapping("/dev-api/vue-element-admin/role/add")
     fun add(){
@@ -129,7 +126,8 @@ object AdminArticleController{
     }
     @GetMapping(ADMIN_ARTICLE_LIST)
     fun list(@Valid params:PageParams):Any{
-        return articleList
+        return ClassLoader.getSystemResourceAsStream("articleList.json")
+            .use { readInputStreamAsString(it!!) }
     }
     @GetMapping("/dev-api/vue-element-admin/article/detail")
     fun detail(){

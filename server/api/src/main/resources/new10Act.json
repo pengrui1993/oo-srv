@@ -1,0 +1,17 @@
+{
+  "code": 200,
+  "count": 6,
+  "rows": [
+    {
+      "id": 72,
+      "nickName": "青春",
+      "storeName": "麦香园休闲",
+      "longitude": "114.130271",
+      "latitude": "22.700883",
+      "distance": 11969.95,
+      "storeId": 73,
+      "newStatus": true,
+      "headImg": "https://image.xfdj.kft.ink/profile/upload/2024/03/04/20240304214647A002.jpeg"
+    }
+  ]
+}

@@ -3,6 +3,9 @@ package com.oo.srv.core
 import org.gavaghan.geodesy.Ellipsoid
 import org.gavaghan.geodesy.GeodeticCalculator
 import org.gavaghan.geodesy.GlobalCoordinates
+import java.util.*
+
+val uuid = { UUID.randomUUID().toString().replace("-","")}
 
 
 private fun main() {
@@ -10,6 +13,18 @@ private fun main() {
 }
 
 
+private fun customerSearching(lat:Double,lng:Double,type:String){
+    val sql = """
+        SELECT*
+        ,ROUND(6378.138 * 2 * ASIN(SQRT(POW(SIN((#{lat} * PI() / 180 - lat * PI() / 180) / 2),2) + COS(40.0497810000 * PI() / 180) * COS(lat * PI() / 180) * POW(SIN((#{lon} * PI() / 180 - lng * PI() / 180) / 2),2))) * 1000) 
+            AS dis
+        FROM user_waitress 
+        WHERE deleted=0 
+            and serving_type like concat('%,',#{type},',%') 
+            ORDER BY dis ASC searching_score DESC
+            limit 10
+    """.trimIndent()
+}
 /*
 https://en.wikipedia.org/wiki/Haversine_formula
 Haversine algorithm in sql

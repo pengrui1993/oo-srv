@@ -9,22 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.io.Serializable
 import java.util.*
 
-@RestController
-private object AuthController {
-    @PostMapping(SMS_LOGIN_URI)
-    fun smsLogin():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-            ,"token" to UUID.randomUUID().toString().replace("-","")
-        )
-    }
-    @PostMapping(LOGOUT_URI)
-    fun logout():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-        )
-    }
-}
+
 
 interface SessionManager{
     fun roleByToken(token:String?):Roles
