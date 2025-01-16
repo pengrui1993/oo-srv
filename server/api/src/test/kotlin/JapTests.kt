@@ -1,11 +1,66 @@
-import com.oo.srv.*
+import com.oo.srv.Application
+import com.oo.srv.SysUser
+import com.oo.srv.SysUserRepo
 import jakarta.annotation.Resource
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
+import jakarta.persistence.*
+import org.hibernate.Session
+import org.hibernate.boot.MetadataSources
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Example
+import org.springframework.jdbc.datasource.DriverManagerDataSource
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDateTime
+
+
+@Entity
+@Table(name = "Events")
+class Event(
+	val title: String? = null
+	,@Column(name = "eventDate")
+	val date: LocalDateTime? = null
+){
+	@Id
+	@GeneratedValue
+	val id: Long? = null
+}
+
+fun hibernateQuickstart(){
+	val registry = StandardServiceRegistryBuilder()
+		.applySetting("jakarta.persistence.jdbc.url","jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1")
+		.applySetting("jakarta.persistence.jdbc.user","sa")
+		.applySetting("jakarta.persistence.jdbc.password","")
+		.applySetting("jakarta.persistence.schema-generation.database.action","create-drop")
+		.applySetting("hibernate.show_sql","true")
+		.applySetting("hibernate.format_sql","true")
+		.applySetting("hibernate.highlight_sql","true")
+		.build()
+	runCatching {
+		val sessionFactory = MetadataSources(registry)
+			.addAnnotatedClass (Event::class.java)
+			.buildMetadata()
+			.buildSessionFactory()
+
+		val now = {LocalDateTime.now()}
+		sessionFactory.inTransaction { session: Session ->
+			session.persist(Event("Our very first event!", now()))
+			session.persist(Event("A follow up event", now()))
+		}
+		sessionFactory.inTransaction { session: Session ->
+			session.createSelectionQuery("from Event",Event::class.java)
+				.resultList.forEach { event: Event ->
+					println("Event (" + event.date + ") : " + event.title)
+				}
+		}
+		sessionFactory.close()
+	}.onFailure {
+		StandardServiceRegistryBuilder.destroy(registry)
+	}
+}
+
 
 /**
  * just use h2 database if that exists
@@ -51,6 +106,7 @@ class JapTests {
 		println("list result...")
 		println(list)
 	}
+
 
 	companion object{
 		@BeforeAll @JvmStatic

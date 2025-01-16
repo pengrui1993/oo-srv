@@ -13,9 +13,7 @@ import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
 
-
-open class CallValues{
-    companion object{
+object CallValues{
         const val READ = 0.toByte()
         const val WRITE = 1.toByte()
 
@@ -24,13 +22,11 @@ open class CallValues{
         const val ADMIN = 2.toByte()
         const val ACCOUNTING = 1.toByte()
         const val OPERATOR = 2.toByte()
-    }
-
 }
 
 @Entity
 @Table(name="biz_api_call_log")
-class BizApiCall:CallValues(){
+class BizApiCall{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Final
@@ -47,11 +43,11 @@ class BizApiCall:CallValues(){
     var uid:Long = 0L
     @Comment("0:guest,1:actress,2:manager")
     @Final
-    var roleType = GUEST
+    var roleType = CallValues.GUEST
     @ColumnDefault("0")
     @Comment("0:read,1:write")
     @Final
-    var rw = READ
+    var rw = CallValues.READ
     @Final
     var startTime = LocalDateTime.now()
     var endTime:LocalDateTime? = null
@@ -65,7 +61,7 @@ class BizApiCall:CallValues(){
 
 @Entity
 @Table(name="sys_api_call_log")
-class SysApiCall:CallValues(){
+class SysApiCall{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id:Long = 0L
@@ -76,10 +72,10 @@ class SysApiCall:CallValues(){
     var cost = BigDecimal.ZERO
     var uid:Long = 0L
     @Comment("0:guest,1:accounting,2:operator")
-    var roleType = GUEST
+    var roleType = CallValues.GUEST
     @ColumnDefault("0")
     @Comment("0:read,1:write")
-    var rw = READ
+    var rw = CallValues.READ
     var startTime = LocalDateTime.now()
     var endTime:LocalDateTime? = null
     @Column(columnDefinition = "TEXT")
@@ -142,14 +138,10 @@ class SysToken{
 @Table(name="sys_config")
 class SysConfig{
     @Id
-    @GeneratedValue(
-        //generator = "custom-generator",
-        strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(generator = "custom-generator",strategy = GenerationType.IDENTITY)
 //    @Column(name = "_key")
     var key = ""//h2 , key is no working
-    @Column(columnDefinition = "TEXT"
-//        ,name="_value"
-    )
+    @Column(columnDefinition = "TEXT")
     var value = ""
     var cfgGroup = ""
     var pattern = ""
@@ -170,14 +162,8 @@ class SysUser:AdminUserInfo{
     var age:Int? = 0
     var curToken:String? = null
     fun clear():SysUser{
-        SysUser::class.java.declaredFields.forEach {
-            it.isAccessible=true
-            it.set(this,null)
-        }
-        return this
+        return clearFieldsToNull(SysUser::class.java,this)
     }
-
-
 
 }
 
@@ -229,7 +215,7 @@ class SysPower(initId:Long = 0, initPid:Long = 0){
     //[path, redirect, hidden, component, children, meta, title, icon, name, alwaysShow, noCache, roles, affix]
 }
 
-
+typealias FileInfoId = Long
 @Entity
 @Table(name="upload_file_info"
     , indexes = [
@@ -240,55 +226,22 @@ class SysPower(initId:Long = 0, initPid:Long = 0){
 class UploadFileInfo{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    var id = 0L
-    var name = "12321321"
-    var refCount = 0L
-    var suffix = ".png"
-    var mime = "image/png"
-    var originName = "girl.png"
-    var description = "that is a normal file"
-    var diskPath = "/data/oosrv/static/upload/20200101/12321321.png"
-    var uriPath = "/2020/01/01/12321321.png"
-    var sha1 = "133123131"
-    var sizeInBytes = 0L
-    var createdTime = LocalDateTime.now()
-    var updatedTime:LocalDateTime = createdTime
-    var uploadDuration:Duration = Duration.ofSeconds(1)
-
-    override fun toString(): String {
-        return "UploadFileInfo(id=$id, name='$name', refCount=$refCount, suffix='$suffix', mime='$mime', originName='$originName', description='$description', diskPath='$diskPath', uriPath='$uriPath', sha1='$sha1', sizeInBytes=$sizeInBytes, createdTime=$createdTime, updatedTime=$updatedTime, uploadDuration=$uploadDuration)"
-    }
+    var id:FileInfoId? = null//1
+    var name:String? = null//"1.png"
+    var refCount:Long? = null//0L
+    var suffix:String? = null//".png"
+    var mime:String?= null//"image/png"
+    var originName:String? = null//"girl.png"
+    var description:String? = null//"that is a normal file"
+    var diskPath:String? = null//"/data/oo-srv/static/upload/20200101/2.png"
+    var uriPath:String? = null//"20200101/2.png"
+    var sha1:String? = null//"d1882b6063a512f60de9cdbc7e77dc2f66754a26"
+    var sizeInBytes:Long? = null//1627848
+    var createdTime:LocalDateTime? = LocalDateTime.now() //2025-01-17 05:15:46.164
+    var updatedTime:LocalDateTime? = createdTime//2025-01-17 05:15:46.164
+    var uploadDuration:Duration? = null//Duration.ofSeconds(1) 1000000
 }
 
-typealias Meta = org.apache.tika.metadata.Metadata
-fun demoForTestMime() {
-    val tika = TikaConfig()
-    val myListOfFiles = listOf(Paths.get("/tmp/springfox-core-2.5.0.jar"))
-    for (f in myListOfFiles) {
-        val metadata = Meta()
-        //TikaInputStream sets the TikaCoreProperties.RESOURCE_NAME_KEY
-        //when initialized with a file or path
-        val v = TikaInputStream.get(f, metadata)
-        val mimetype = tika.detector.detect(v, metadata).toString()
-        println("File $f is $mimetype")//File /tmp/j1.jpg is image/jpeg
-    }
-    val myListOfStreams = listOf(
-        URI.create("file:///tmp/j1.jpg").toURL().openStream()
-        ,Files.newInputStream(Paths.get("/tmp/dicts.xlsx"))
-    )
-    for (`is` in myListOfStreams) {
-        `is`.use {
-            val metadata = Meta()
-            //if you know the file name, it is a good idea to
-            //set it in the metadata, e.g.
-            //metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, "somefile.pdf");
-            val mimetype: String = tika.getDetector().detect(
-                TikaInputStream.get(`is`), metadata
-            ).toString()
-            println("Stream $`is` is $mimetype")
-        }
-    }
-}
 @Entity
 @Table(name="biz_payment")
 class BizPayment{
@@ -366,7 +319,9 @@ class TableVersionManager{
         //flush dirtyTables data to storage
         dirtyTables.clear()
     }
+
 }
+
 class TableVersion(val name:String = "TableVersion"){
     var version = 0
 }

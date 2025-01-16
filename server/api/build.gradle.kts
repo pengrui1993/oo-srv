@@ -6,6 +6,10 @@ plugins {
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+
+    //lombok
+    kotlin("plugin.lombok") version "1.9.25"
+    id("io.freefair.lombok") version "8.10"
 }
 tasks.getByName<BootJar>("bootJar") {
     enabled = false
@@ -42,6 +46,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation(project(":core"))
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    implementation("org.springframework.boot:spring-boot-starter-validation") // for @Validated
 
     implementation("cn.hutool:hutool-all:5.8.25")
     implementation("commons-codec:commons-codec:1.17.0")

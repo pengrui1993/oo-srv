@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!-- 文件输出格式 -->
-    <property name="PATTERN" value="[TID:%X{trace_uuid}] %-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+    <property name="PATTERN" value="[TID:%X{trace_uuid}] %-12(%d) |-%-5level [%thread] %c [%L] -| %msg%n" />
     <property name="LOG_NAME" value="oosrv" />
     <!--所在项目包 打印日志用-->
     <property name="PACKAGE_NAME" value="com.oo.srv" />
     <!-- pro文件路径 -->
     <property name="PROD_FILE_PATH" value="./log/${LOG_NAME}" />
+    <!--
+        https://cloud.tencent.com/developer/article/1914231
+        https://blog.csdn.net/weixin_45839894/article/details/126622478
+        %highlight()
+        %black()
+        %red()
+        %green()
+        %yellow()
+        %blue()
+        %magenta()
+        %cyan()
+        %white()
+        %gray()
 
+        %boldMagenta()
+        %boldYellow()
+        %bold...
+
+        %-5level %p
+    -->
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>${PATTERN}</pattern>
+                <pattern>%boldMagenta([TID:%X{trace_uuid}]) %green(%-12(%d)) |-%highlight(%-5level) %cyan([%thread]) %magenta(%logger{50}) %boldYellow([%L])-| %highlight(%msg) %n</pattern>
             </encoder>
         </appender>
-        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${PROD_FILE_PATH}${file.separator}${LOG_NAME}.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <!-- rollover daily -->
-                <fileNamePattern>${PROD_FILE_PATH}${file.separator}${LOG_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-                <maxHistory>30</maxHistory>
-                <maxFileSize>100MB</maxFileSize>
-                <totalSizeCap>20GB</totalSizeCap>
-            </rollingPolicy>
-            <encoder>
-                <pattern>
-                    [%date{yyyy-MM-dd HH:mm:ss.SSS}] %X{logthreadId} %-5level %logger{80} %method  %line - %msg%n
-                </pattern>
-            </encoder>
-        </appender>
-        <!-- 输出到文件 -->
         <logger name="org.springframework.jdbc.core.JdbcTemplate" level="debug"/>
         <logger name="org.apache.ibatis.reflection" level="INFO"/>
         <logger name="com.github.binarywang.wxpay" level="debug"/>
         <logger name="com.github.binarywang.demo.wx.pay" level="debug"/>
-
         <logger name="${PACKAGE_NAME}" level="debug" />
         <root level="info">
             <appender-ref ref="CONSOLE" />
@@ -61,9 +62,8 @@
                 <totalSizeCap>20GB</totalSizeCap>
             </rollingPolicy>
             <encoder>
-                <pattern>
-                    [%date{yyyy-MM-dd HH:mm:ss.SSS}] %X{logthreadId} %-5level %logger{80} %method  %line - %msg%n
-                </pattern>
+                <!-- [%date{yyyy-MM-dd HH:mm:ss.SSS}] %X{logthreadId} %-5level %logger{80} %method  %line - %msg%n-->
+                <pattern>${PATTERN}</pattern>
             </encoder>
         </appender>
         <!-- 输出到文件 -->

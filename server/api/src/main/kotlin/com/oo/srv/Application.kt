@@ -31,6 +31,9 @@ lateinit var ctx:ConfigurableApplicationContext
 lateinit var app:SpringApplication
 private lateinit var forCore:BeanManager
 fun start(vararg args:String):()->Unit{
+//    System.setProperty("spring.output.ansi.enabled","ALWAYS")
+//    println(System.getenv("spring.output.ansi.enabled"))//null
+//    println(System.getProperty("spring.output.ansi.enabled"))//vm option:-Dspring.output.ansi.enabled=ALWAYS
     ctx = runApplication<Application>(*args,init = {
         app = this
         addListeners(ApplicationPidFileWriter())
@@ -93,7 +96,7 @@ class ApplicationProperties(
      //url: http://habf.com/oo-srv/static/20230303/abc.jpg
      ,@Value("\${sys.uploaded.url.path.prefix:/oo-srv/static}") //TODO nginx 配置
      var uploadedFilesUrlPathPrefix:String
-     ,@Value("\${sys.disk.upload.location:/tmp/static}")
+     ,@Value("\${sys.disk.upload.location:/tmp/oo-srv/upload}")
      var uploadedFilesPathPosition:String
      ,@Value("\${sys.debug:true}")
      var isDebug:Boolean
@@ -113,7 +116,7 @@ class ApplicationProperties(
                 //reload config from database
             }
             else->{
-               log.info("event type:${event::class.java} from ${event.source}")
+               log.info("event type:${event::class.java.simpleName} from ${event.source.javaClass.simpleName}")
             }
         }
         val initTimeClass = setOf(

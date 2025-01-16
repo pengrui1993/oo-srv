@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import jakarta.persistence.criteria.Expression
 import org.hibernate.Session
+import org.hibernate.StatelessSession
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.ExampleMatcher
 import org.springframework.data.domain.Sort
@@ -45,7 +46,7 @@ interface SysUserRepo:ParentRepository<SysUser,String>
 //@Repository
 //interface SysRolePowersRepo:ParentRepository<SysRolePowers,Long>
 @Repository
-interface UploadFileInfoRepo:ParentRepository<UploadFileInfo,Long>
+interface UploadFileInfoRepo:ParentRepository<UploadFileInfo,FileInfoId>
 @Repository
 interface WaitressRepo:ParentRepository<ActressUser,Long>//TODO
 
@@ -91,7 +92,9 @@ fun useJdbc(mgr: EntityManager){
         t.rollback()
     }
     session.close()
+    //如果要将很多对象持久化，你必须通过经常的调用 flush() 以及稍后调用 clear() 来控制第一级缓存的大小。
     mgr.flush() //if change the entity state
+    mgr.clear() //clear cache
 }
 
 @Service
@@ -102,6 +105,8 @@ class DemoService(
 ){
     init{
         val session = entityManager.unwrap(Session::class.java)
+        val ss = session.sessionFactory.openStatelessSession()
+        ss.close()
         session.close()
     }
     @Resource
