@@ -12,7 +12,7 @@ class TestInitRunner(
 //    @Resource val tokenRepo:SysTokenRepo
 //    ,@Resource val roleRepo:SysRoleRepo
     @Resource val transRepo:BizTranRepo
-    ,@Resource val userRepo:SysUserRepo
+//    ,@Resource val userRepo:SysUserRepo
 ):CommandLineRunner{
     override fun run(vararg args: String?) {
         val transList = ClassLoader.getSystemResourceAsStream("transList.json")
@@ -29,8 +29,7 @@ class TestInitRunner(
             val res = transRepo.save(item)
             println(res.order_no)
         }
-        val saved = userRepo.save(SysUser().also { it.name="tony";it.role="admin-token";it.uname="admin";it.upwd="111111" })
-        println(saved)
+
     }
 }
 

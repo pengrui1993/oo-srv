@@ -6,6 +6,7 @@ import com.oo.srv.core.WaitressRepository
 import jakarta.annotation.Resource
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import jakarta.persistence.criteria.Expression
 import org.hibernate.Session
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.ExampleMatcher
@@ -15,6 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 
@@ -71,24 +73,104 @@ fun findByExample(repo:BizApiCallRepository){
 }
 fun useJdbc(mgr: EntityManager){
     val session: Session = mgr.unwrap(Session::class.java)
-    session.doWork { conn->
-        val ps = conn.prepareStatement("select * from sys_file as t where id = ?")
-        ps.setLong(1,1L)
-        val rs = ps.executeQuery()
-        while(rs.next()){
-            val id = rs.getString("id")
-            val name = rs.getString("name")
+    val t =session.beginTransaction()
+    try{
+        session.doWork { conn->
+            val ps = conn.prepareStatement("select * from sys_file as t where id = ?")
+            ps.setLong(1, 1L)
+            val rs = ps.executeQuery()
+            while (rs.next()) {
+                val id = rs.getString("id")
+                val name = rs.getString("name")
+            }
+            rs.close()
+            ps.close()
         }
-        rs.close()
-        ps.close()
+        t.commit()
+    }catch (ignore:Throwable){
+        t.rollback()
     }
     session.close()
     mgr.flush() //if change the entity state
 }
-class DemoService{
+
+@Service
+class DemoService(
     @Resource
     @PersistenceContext
-    private lateinit var entityManager: EntityManager
+    private val entityManager: EntityManager
+){
+    init{
+        val session = entityManager.unwrap(Session::class.java)
+        session.close()
+    }
+    @Resource
+    private lateinit var userRepo:SysUserRepo
     @Resource
     private lateinit var transactionTemplate: TransactionTemplate
+
+//    @PostConstruct
+    private fun init(){
+        val saved = userRepo.save(
+            SysUser().also
+            { it.name="tony";it.role="admin-token"
+                it.uname="admin";it.upwd="111111"
+                it.age = 13
+            }
+        )
+        val builder = entityManager.criteriaBuilder
+        val query = builder.createQuery(SysUser::class.java)
+        val model = query.from(SysUser::class.java)
+
+        val name:Expression<String> = model["uname"]
+        val age:Expression<Int> = model["age"]
+        val cond1 = builder.gt(age,10)
+        val cond2 = builder.like(name,"%min%")
+        val combineCondition = builder.and(cond1,cond2)
+
+        val typedQuery = query.select(model)
+            .where(combineCondition)
+            .orderBy(builder.asc(age),builder.desc(name))
+            .let { entityManager.createQuery(it) }//sql no execution
+
+        val pageNumber = 1
+        val pageSize = 5
+        typedQuery.firstResult = (pageNumber-1)*pageSize
+        typedQuery.maxResults = pageSize
+//        val record = result.singleResult
+        val records = typedQuery.resultList //execution is lazy
+        println(records)
+        println("list result...")
+
+        val conditions = listOf<Any>(
+            builder.equal(name,"admin")
+            ,builder.le(age,3)
+            ,builder.lessThan(age,3)
+            ,builder.lessThanOrEqualTo(age,3)
+            ,builder.like(name,"%min%")
+            ,builder.between(age,10,20)
+            ,builder.isNull(name)
+            ,builder.isNotNull(name)
+        )
+    }
+
+
+    private fun page(namePattern:String):Pair<Long,List<SysUser>>{
+        val manager = entityManager
+        val builder = manager.criteriaBuilder
+
+
+        val cq = builder.createQuery(Long::class.java)
+        val model = cq.from(SysUser::class.java)
+        cq.where(builder.like(model["name"],"%$namePattern%"))
+        cq.select(builder.count(model))
+
+        val count = manager.createQuery(cq).singleResult
+
+
+        val query = builder.createQuery(SysUser::class.java).select(model).where(builder.like(model["name"],"%$namePattern%"))
+        val result = manager.createQuery(query).also { it.firstResult = 0;it.maxResults =5 }
+
+        return count to result.resultList
+    }
 }

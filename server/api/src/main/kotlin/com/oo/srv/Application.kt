@@ -98,6 +98,7 @@ class ApplicationProperties(
      ,@Value("\${sys.debug:true}")
      var isDebug:Boolean
 ):ApplicationListener<ApplicationEvent> ,PropertiesAccessor{
+    private val log = LoggerFactory.getLogger(javaClass)
     override val localUploadedPath: String
         get() = uploadedFilesPathPosition
     override val urlPrefix: String
@@ -106,7 +107,6 @@ class ApplicationProperties(
         get() = origin
     override val debug: Boolean
         get() = isDebug
-    private val log = LoggerFactory.getLogger(javaClass)
     override fun onApplicationEvent(event: ApplicationEvent) {
         when(event){
             is ApplicationStartedEvent->{

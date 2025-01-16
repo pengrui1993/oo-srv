@@ -142,12 +142,18 @@ class SysToken{
 @Table(name="sys_config")
 class SysConfig{
     @Id
-    @GeneratedValue()
-    var key = ""
+    @GeneratedValue(
+        //generator = "custom-generator",
+        strategy = GenerationType.IDENTITY)
+//    @Column(name = "_key")
+    var key = ""//h2 , key is no working
+    @Column(columnDefinition = "TEXT"
+//        ,name="_value"
+    )
+    var value = ""
     var cfgGroup = ""
     var pattern = ""
-    @Column(columnDefinition = "TEXT")
-    var value = ""
+
 }
 @Entity
 @Table(name="sys_user")
@@ -156,10 +162,12 @@ class SysUser:AdminUserInfo{
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id:Long? = null
     var avatar:String? = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    @Column(unique = true)
     var uname:String? = ""
     var upwd:String? = ""
     var name:String? = ""
     var role:String? = ""
+    var age:Int? = 0
     var curToken:String? = null
     fun clear():SysUser{
         SysUser::class.java.declaredFields.forEach {
@@ -168,6 +176,9 @@ class SysUser:AdminUserInfo{
         }
         return this
     }
+
+
+
 }
 
 //@Entity
@@ -332,4 +343,30 @@ class ActressUser{
     var avatar = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
     var openId = "234432"
     var gender = "female"
+}
+
+class TableVersionManager{
+    private val mainTableId ="TableVersion"
+    private val record = mutableMapOf(
+        mainTableId to TableVersion(mainTableId)
+        ,"sys_user" to TableVersion("sys_user")
+    )
+    private val dirtyTables = mutableSetOf<String>()
+    fun onTableStateChange(id:String){
+        if(id==mainTableId)return
+        record[id]?.let {
+            it.version++
+            record[mainTableId]!!.version++
+            dirtyTables+=id
+            dirtyTables+=mainTableId
+        }
+    }
+    fun onTick(){
+        if(dirtyTables.isEmpty())return
+        //flush dirtyTables data to storage
+        dirtyTables.clear()
+    }
+}
+class TableVersion(val name:String = "TableVersion"){
+    var version = 0
 }

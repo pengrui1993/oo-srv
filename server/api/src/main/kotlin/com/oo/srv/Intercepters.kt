@@ -21,11 +21,13 @@ class Config2(@Resource private val auth:AppAuthInterceptor
     override fun addCorsMappings(registry: CorsRegistry) {
         listOf(clientApiPattern,adminApiPattern).forEach {
             registry.addMapping(it)
-                .allowedOrigins("*")
+//                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(false)//true
+                .allowCredentials(true)
                 .maxAge(3600)
                 .allowedHeaders("*")
+
         }
     }
     override fun addInterceptors(registry: InterceptorRegistry) {

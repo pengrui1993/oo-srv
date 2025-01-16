@@ -45,13 +45,14 @@ enum class AdminApiCode(val code:Int,val msg:String){
     ;
 }
 enum class AdminRoles{
-    GUEST,WAITRESS,CUSTOMER
+    ADMIN,ACCOUNTANT,OPERATOR,THIRD_SERVER
     ;
     fun toCoreRole(){
         when(this){
-            GUEST-> Roles.GUEST
-            WAITRESS-> Roles.WAITRESS
-            CUSTOMER-> Roles.CUSTOMER
+            ADMIN-> Roles.ADMIN
+            ACCOUNTANT-> Roles.ACCOUNTANT
+            OPERATOR-> Roles.OPERATOR
+            THIRD_SERVER-> Roles.THIRD_SERVER
         }
     }
 }

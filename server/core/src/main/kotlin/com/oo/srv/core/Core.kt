@@ -52,7 +52,7 @@ typealias OrderId = Long
 typealias PaymentId = Long
 typealias CouponId = Long
 typealias InvitingCodeId = String
-
+typealias CashOutRequestId = Long
 
 interface Customer
 interface Waitress
@@ -60,6 +60,7 @@ interface Order
 interface Payment
 interface Coupon
 interface InvitingCode
+interface CashOutRequest
 
 interface CustomerRepository
 interface ManagerRepository
@@ -68,6 +69,7 @@ interface PaymentRepository
 interface OrderRepository
 interface CouponRepository
 interface InvitingCodeRepository
+interface CashOutRequestRepository
 //space
 typealias Address = Long //xx省 xx市 xx区 xx街道 xx小区 xx栋 xx单元 xx号
 typealias Position = Pair<Double,Double>//first lng ,second:lat
@@ -76,7 +78,9 @@ typealias TimePoint = LocalDateTime
 typealias TimeDuration = Duration
 
 enum class Roles{
-    GUEST,WAITRESS,CUSTOMER,ADMIN,WX_PAY_SERVER,SELF_SERVER_TIMER
+    GUEST,WAITRESS,CUSTOMER,ADMIN,ACCOUNTANT,OPERATOR
+    ,THIRD_SERVER// WX_PAY_SERVER
+    ,SELF_TIMER
 }
 
 /*
@@ -87,20 +91,27 @@ waitress:女服务员
 actress:女演员
  */
 enum class Progress{
-    CUSTOMER_CHOICE_WAITRESS_TO_SERVICE_ITSELF
+    CUSTOMER_CHOICE_WAITRESS_TO_SERVICE_ITSELF_AND_PAY
+    , WAITRESS_REGISTER_AND_SUBMIT_INFO_THEN_AUDITING
 
     ,WAITRESS_CASH_OUT
 }
 
 enum class Action{
-    CUSTOMER_REGISTER_BY_INVITED_WITH_PHONE
-    ,CUSTOMER_LOGIN,CUSTOMER_LOGOUT
+    CUSTOMER_REGISTER_OR_LOGIN_BY_PHONE,CUSTOMER_LOGOUT
+    ,CUSTOMER_REQUEST_UNREGISTER,CUSTOMER_CANCEL_UNREGISTER
+    ,CUSTOMER_BIND_WX_OPENID
+    ,CUSTOMER_CREATE_ORDER
+    ,CUSTOMER_PAY_FOR_ORDER
+    ,CUSTOMER_CANCEL_ORDER
+    ,CUSTOMER_APPRAISE_WAITRESS
 
-    ,WAITRESS_REGISTER_BY_INVITED_WITH_PHONE
-    ,WAITRESS_LOGIN,WAITRESS_LOGOUT
+    ,WAITRESS_REGISTER_BY_PHONE_WITH_INVITED_CODE
+    ,WAITRESS_LOGIN_BY_PHONE,WAITRESS_LOGOUT
     ,WAITRESS_REBIND_PHONE_NUMBER
+    ,WAITRESS_REBIND_WX_OPENID
     ,WAITRESS_FILL_INFORMATION
-    ,WAITRESS_PROVIDE_SERVED_ADDRESS //服务地点及其半径
+    ,WAITRESS_PROVIDE_SERVED_ADDRESS //服务地点 [也许]及其半径【可以根据服务位置运算】
     ,WAITRESS_START_SERVING //上线
     ,WAITRESS_STOP_SERVING  //下线
     ,WAITRESS_ACCEPT_ORDER  //接单

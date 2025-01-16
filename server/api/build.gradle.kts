@@ -1,17 +1,15 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
 }
-
 tasks.getByName<BootJar>("bootJar") {
     enabled = false
 }
-
 //tasks.getByName<Jar>("jar") {
 //    enabled = false
 //}
@@ -25,6 +23,8 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -51,7 +51,7 @@ dependencies {
     implementation("org.apache.tika:tika:3.0.0")
     implementation("org.apache.tika:tika-core:3.0.0")
     implementation("com.github.whvcse:easy-captcha:1.6.2")
-}
+    }
 
 tasks.test {
     useJUnitPlatform()
