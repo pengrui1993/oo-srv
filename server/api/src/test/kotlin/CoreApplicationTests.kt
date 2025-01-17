@@ -1,4 +1,4 @@
-import com.oo.srv.Application
+import com.oo.srv.api.Application
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 

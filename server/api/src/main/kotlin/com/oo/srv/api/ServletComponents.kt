@@ -25,13 +25,13 @@ private object TomcatSessionManager: SessionListener{
 }
 
 @Component
-private object RequestManager: ServletRequestListener{
+private class RequestManager(val pa: PropertiesAccessor): ServletRequestListener{
     private val log = LoggerFactory.getLogger(javaClass)
     override fun requestDestroyed(sre: ServletRequestEvent) {
-        log.info(sre.toString())
+//        if(pa.debug) log.info(sre.toString())
     }
     override fun requestInitialized(sre: ServletRequestEvent) {
-        log.info(sre.toString())
+//        if(pa.debug) log.info(sre.toString())
     }
 }
 
@@ -58,7 +58,7 @@ class DemoListener: ServletContextListener {
     }
 }
 //@Component//must be having the annotation if you want it is working
-@WebFilter(urlPatterns = ["/**"])
+//@WebFilter(urlPatterns = ["/**"])
 private object DemoFilter : OncePerRequestFilter(){
     override fun doFilterInternal(
         request: HttpServletRequest,

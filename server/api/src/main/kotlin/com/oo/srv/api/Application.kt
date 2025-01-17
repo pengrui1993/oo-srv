@@ -121,7 +121,7 @@ class ApplicationProperties(
                 //reload config from database
             }
             else->{
-               log.info("event type:${event::class.java.simpleName} from ${event.source.javaClass.simpleName}")
+//               log.info("event type:${event::class.java.simpleName} from ${event.source.javaClass.simpleName}")
             }
         }
         val initTimeClass = setOf(

@@ -39,6 +39,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.session:spring-session-jdbc")
+    // https://mvnrepository.com/artifact/de.codecentric/spring-boot-admin-starter-client
+    implementation("de.codecentric:spring-boot-admin-starter-client:3.4.1")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("org.postgresql:postgresql")
 //    implementation("com.h2database:h2")
     testRuntimeOnly("com.h2database:h2")

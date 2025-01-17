@@ -1,6 +1,6 @@
-import com.oo.srv.Application
-import com.oo.srv.SysUser
-import com.oo.srv.SysUserRepo
+import com.oo.srv.api.Application
+import com.oo.srv.api.SysUser
+import com.oo.srv.api.SysUserRepo
 import jakarta.annotation.Resource
 import jakarta.persistence.*
 import org.hibernate.Session
@@ -9,9 +9,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Example
-import org.springframework.jdbc.datasource.DriverManagerDataSource
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
@@ -80,9 +77,9 @@ class JapTests {
 	fun beforeEach(){ println("before each...")}
 	@Test
 	fun testSave() {
-		val saved = userRepo.save(SysUser().also { it.name="tony";it.role="admin-token";it.uname="admin";it.upwd="111111" })
+		val saved = userRepo.save(SysUser().also { it.name="tony";it.role="admin-token";it.uname="admin1";it.upwd="111111" })
 		val one = userRepo.findOne(Example.of(SysUser().clear().also {
-			it.name = "tony";it.uname = "admin"
+			it.name = "tony";it.uname = "admin1"
 		}))
 		Assertions.assertEquals(saved.id,one.get().id)
 	}
@@ -92,7 +89,7 @@ class JapTests {
 	@Test
 	fun testCriteria(){
 		userRepo.save(SysUser().clear().also {
-			it.name = "tony";it.uname = "admin";it.age=13
+			it.name = "tony";it.uname = "admin2";it.age=13
 		})
 		val cb = entityManager.criteriaBuilder
 		val queryCreator = cb.createQuery(SysUser::class.java)
@@ -103,7 +100,7 @@ class JapTests {
 		val criteriaQuery = queryCreator.select(model).where(combineCondition)
 		val result = entityManager.createQuery(criteriaQuery)
 		val list = result.resultList
-		println("list result...")
+		Assertions.assertNotEquals(list.size,0)
 		println(list)
 	}
 
