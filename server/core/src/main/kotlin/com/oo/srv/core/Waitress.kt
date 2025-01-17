@@ -17,7 +17,7 @@ private fun numbers() {
 }
 class WaitressAddresses{
     val id = 0L
-    var wid:WaitressId = 0L
+    var wid: WaitressId = 0L
     var contact = "联系人"
     var phone = "联系人手机号"
     var major = "四川省重庆市南岸区"
@@ -30,10 +30,10 @@ class WaitressAddresses{
         notifyWaitressSetDefaultAddress(this)
     }
 }
-fun onSetAsDefaultAddress(wa:WaitressAddresses,map:Map<WaitressId,WaitressImpl>){
+fun onSetAsDefaultAddress(wa: WaitressAddresses, map:Map<WaitressId, WaitressImpl>){
     wa.onSetAsDefaultAddress { map[it.wid]?.onSetLngLat(it.lng,it.lat) }
 }
-open class WaitressCurrentState(val id:WaitressId){
+open class WaitressCurrentState(val id: WaitressId){
     private var version = 0
     private var inServing = false
     private var canCashOut = false

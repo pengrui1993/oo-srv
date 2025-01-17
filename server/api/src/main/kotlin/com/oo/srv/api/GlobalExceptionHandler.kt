@@ -1,9 +1,10 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
+import org.springframework.data.redis.serializer.SerializationException
 import org.springframework.http.HttpStatus
 import org.springframework.validation.BindException
 import org.springframework.web.HttpRequestMethodNotSupportedException
@@ -44,6 +45,10 @@ private object GlobalExceptionHandler {
     }
     @ExceptionHandler(value = [RuntimeException::class])
     fun unknownRuntimeException(ex: RuntimeException): Any {
+        return defaultApiHandle(ex)
+    }
+    @ExceptionHandler(value = [SerializationException::class])
+    fun redisSerialException(ex: SerializationException): Any {
         return defaultApiHandle(ex)
     }
     @ExceptionHandler(value = [IllegalArgumentException::class])

@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 const val BASE_PKG = "com.oo.srv"
 
 @Retention(AnnotationRetention.SOURCE)
@@ -62,8 +62,8 @@ const val TRACE_TOKEN = "trace_uuid"//see logback.xml
 const val CLIENT_API_PATTERN    = "/oo-srv/api/**"
 const val ADMIN_API_PATTERN     = "/dev-api/vue-element-admin/**"
 
-const val AOP_ALL_PACKAGE = "execution(* ${BASE_PKG}..*(..))"
-const val AOP_CONTROLLER_MATCH = "execution(* ${BASE_PKG}..*Controller.*(..))"
+const val AOP_ALL_PACKAGE =         "execution(* ${BASE_PKG}..*(..))"
+const val AOP_CONTROLLER_MATCH =    "execution(* ${BASE_PKG}..*Controller.*(..))"
 
 const val REQ_USER_KEY = "REQ_USER_KEY"
 const val AUTH_CAPTCHA_KEY = "captcha"

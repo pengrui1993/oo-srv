@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import cn.hutool.core.util.URLUtil
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-@JsonSerialize(using = FileIdsSplitFormat::class)
+@JsonSerialize(using = com.oo.srv.api.FileIdsSplitFormat::class)
 @JacksonAnnotationsInside
 annotation class FilesUrlVo
 /**
@@ -58,7 +58,7 @@ annotation class FilesUrlVo
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-@JsonSerialize(using = FileIdFormat::class)
+@JsonSerialize(using = com.oo.srv.api.FileIdFormat::class)
 @JacksonAnnotationsInside
 annotation class FileUrlVo
 
@@ -96,8 +96,8 @@ private fun lastIndexOfSeparator(filePath: String, ln: Int): Int {
 }
 
 class FileIdFormat(
-    @Resource val props:PropertiesAccessor
-    ,@Resource val cache:FileInfoCache
+    @Resource val props: com.oo.srv.api.PropertiesAccessor
+    ,@Resource val cache: com.oo.srv.api.FileInfoCache
 ): JsonSerializer<String>(){
     override fun serialize(value: String, jsonGenerator: JsonGenerator, serializers: SerializerProvider){
         if (!StringUtils.isEmpty(value) && (value != "true") && (value != "false")) {
@@ -106,7 +106,7 @@ class FileIdFormat(
                 url = value
             } else {
                 val absolutePath = cache.get(value.toLong())
-                val suffixName = getPathSuffixName(absolutePath)
+                val suffixName = com.oo.srv.api.getPathSuffixName(absolutePath)
                 url = URLUtil.completeUrl(props.serverOrigin, "${props.urlPrefix}$suffixName")
             }
             jsonGenerator.writeString(url)
@@ -117,10 +117,10 @@ class FileIdFormat(
 
 }
 class FileIdsSplitFormat(
-    @Resource val props:PropertiesAccessor
-    ,@Resource val cache:FileInfoCache
+    @Resource val props: com.oo.srv.api.PropertiesAccessor
+    ,@Resource val cache: com.oo.srv.api.FileInfoCache
 ): JsonSerializer<String>() {
-    private val sep = DB_FILE_SEP
+    private val sep = com.oo.srv.api.DB_FILE_SEP
     override fun serialize(value: String, jsonGenerator: JsonGenerator, serializers: SerializerProvider) {
         if(StringUtils.isEmpty(value)
             || Objects.equals("true",value)
@@ -132,7 +132,8 @@ class FileIdsSplitFormat(
         val urlArray = value.split(sep).stream().map{it.trim()}.filter { it.isNotEmpty() }
             .map { if(isNotFromLocalDisk(it)) it
                     else { URLUtil.completeUrl(props.serverOrigin
-                , props.urlPrefix + getPathSuffixName(cache.get(it.toLong())))} }
+                , props.urlPrefix + com.oo.srv.api.getPathSuffixName(cache.get(it.toLong()))
+            )} }
             .toList().toTypedArray()
         jsonGenerator.writeArray(urlArray, 0, urlArray.size)
     }
@@ -143,15 +144,15 @@ private fun example(){
     val url2 = URLUtil.completeUrl("http://test/abc/", "/image/pkg.png")
     if(url1==url2) println(url2) //  http://test/image/pkg.png
 }
-fun UploadFileInfo.empty():UploadFileInfo{
+fun com.oo.srv.api.UploadFileInfo.empty(): com.oo.srv.api.UploadFileInfo {
     uriPath = "/TODO/IF/ERROR/FileAbout.kt"//TODO
     return this
 }
 @Component
-class FileInfoCache(@Resource val fileRepository:UploadFileInfoRepo){
-    private val empty = UploadFileInfo().empty()
-    private val loader = object: CacheLoader<Long, UploadFileInfo>(){
-        override fun load(key: Long): UploadFileInfo {//load file info from database
+class FileInfoCache(@Resource val fileRepository: com.oo.srv.api.UploadFileInfoRepo){
+    private val empty = com.oo.srv.api.UploadFileInfo().empty()
+    private val loader = object: CacheLoader<Long, com.oo.srv.api.UploadFileInfo>(){
+        override fun load(key: Long): com.oo.srv.api.UploadFileInfo {//load file info from database
             return fileRepository.findByIdOrNull(key)?:empty
         }
     }
@@ -160,37 +161,37 @@ class FileInfoCache(@Resource val fileRepository:UploadFileInfoRepo){
         .maximumSize(10000)
         .initialCapacity(300)
         .build(loader)
-    fun getFileInfo(id:FileInfoId):UploadFileInfo?{
+    fun getFileInfo(id: com.oo.srv.api.FileInfoId): com.oo.srv.api.UploadFileInfo?{
         val res = cache.get(id)
         return if(res!=empty)res else null
     }
-    fun get(fileInfoId:FileInfoId):String{
+    fun get(fileInfoId: com.oo.srv.api.FileInfoId):String{
         return cache.get(fileInfoId).uriPath!!
     }
 }
 interface Storage{
     fun exists(size: Long, sha1: String): Boolean
-    fun fetch(id: FileInfoId): UploadFileInfo?
-    fun store(mf: MultipartFile): UploadFileInfo
+    fun fetch(id: com.oo.srv.api.FileInfoId): com.oo.srv.api.UploadFileInfo?
+    fun store(mf: MultipartFile): com.oo.srv.api.UploadFileInfo
 }
 
 @Component
 class StorageImpl(
-    @Resource val fileRepository:UploadFileInfoRepo
-    ,@Resource val propertiesAccessor: PropertiesAccessor
-    ,@Resource val fileInfoCache: FileInfoCache
-):Storage{
+    @Resource val fileRepository: com.oo.srv.api.UploadFileInfoRepo
+    ,@Resource val propertiesAccessor: com.oo.srv.api.PropertiesAccessor
+    ,@Resource val fileInfoCache: com.oo.srv.api.FileInfoCache
+): com.oo.srv.api.Storage {
     private val log = LoggerFactory.getLogger(javaClass)
     override fun exists(size: Long, sha1: String): Boolean {
         return fileRepository.count(exampleBy(size,sha1))>0
     }
-    override fun fetch(id: FileInfoId): UploadFileInfo? {
+    override fun fetch(id: com.oo.srv.api.FileInfoId): com.oo.srv.api.UploadFileInfo? {
         return fileInfoCache.getFileInfo(id)
     }
     private val diskPrefix:String get() = propertiesAccessor.localUploadedPath
     private val now = {System.currentTimeMillis()}
-    override fun store(mf: MultipartFile): UploadFileInfo {
-        val ufi = UploadFileInfo()
+    override fun store(mf: MultipartFile): com.oo.srv.api.UploadFileInfo {
+        val ufi = com.oo.srv.api.UploadFileInfo()
         ufi.originName = mf.originalFilename?:""
         ufi.refCount = 0L
         ufi.sizeInBytes = mf.size
@@ -209,7 +210,7 @@ class StorageImpl(
             mf.transferTo(newFullPath)
             saved.uploadDuration = Duration.ofMillis(now()-start)
         }
-        saved.sha1 = sha1(newFullPath)
+        saved.sha1 = com.oo.srv.api.sha1(newFullPath)
         run l0@{//check file exists
             val example = exampleBy(saved.sizeInBytes!!,saved.sha1!!)
             val page =  PageRequest.of(0, 5,Sort.by("createdTime").descending())
@@ -219,7 +220,7 @@ class StorageImpl(
                 if(Objects.isNull(exist)||Objects.isNull(exist.diskPath))continue
                 val p1 = Paths.get(exist.diskPath!!)
                 if(!Files.exists(p1)||!Files.isRegularFile(p1)) continue
-                if(isSameFileInBytes(p1,newFullPath.toPath())){
+                if(com.oo.srv.api.isSameFileInBytes(p1, newFullPath.toPath())){
                     log.warn("file conflicted,new file path:{},exists first path:{},exists size:{}"
                         , newFullPath, exist.diskPath,sameSizeAndSha1Files.size)
                     newFullPath.delete()
@@ -229,9 +230,9 @@ class StorageImpl(
             }
         }
         saved.name = newName
-        saved.diskPath = diskPath(newFullPath)
+        saved.diskPath = com.oo.srv.api.diskPath(newFullPath)
         saved.uriPath =  "$subDirName/$newName"//20201212/123213.txt
-        saved.mime = saved.mime?:mimeFound(FileSystemResource(saved.diskPath!!))
+        saved.mime = saved.mime?: com.oo.srv.api.mimeFound(FileSystemResource(saved.diskPath!!))
         saved.updatedTime = LocalDateTime.now()
         saved = fileRepository.save(saved)
         log.info("saved file path:{},id:{}", saved.diskPath,saved.id)
@@ -250,9 +251,9 @@ class StorageImpl(
         }
     }
 
-    private fun exampleBy(size: Long, sha1: String):Example<UploadFileInfo>{
+    private fun exampleBy(size: Long, sha1: String):Example<com.oo.srv.api.UploadFileInfo>{
         return Example.of(
-            clearFieldsToNull(UploadFileInfo::class.java,UploadFileInfo())
+            com.oo.srv.api.clearFieldsToNull(com.oo.srv.api.UploadFileInfo::class.java, com.oo.srv.api.UploadFileInfo())
                 .apply { sizeInBytes = size;this.sha1 = sha1 }
             ,ExampleMatcher.matching().withIgnoreNullValues()
         )
@@ -296,8 +297,9 @@ fun demoForTestMime() {
     }
 }
 fun testFileMime() {
-    val v = mimeFound(UrlResource("file:///tmp/oo-srv/upload/20250117/1.png"))//image/png
-    val v2 = mimeFound(UrlResource("file:///Users/pengrui/Downloads/中国银行线上收银台接口规范1.2(1).docx"))//application/x-tika-ooxml
+    val v = com.oo.srv.api.mimeFound(UrlResource("file:///tmp/oo-srv/upload/20250117/1.png"))//image/png
+    val v2 =
+        com.oo.srv.api.mimeFound(UrlResource("file:///Users/pengrui/Downloads/中国银行线上收银台接口规范1.2(1).docx"))//application/x-tika-ooxml
     println(v)
     println(v2)
 }
@@ -311,5 +313,5 @@ fun testExtension() {
     println(ext)//.bin
 }
 fun detectApiUse() {
-    println(diskPath(File("docs")))//f.canonicalPath
+    println(com.oo.srv.api.diskPath(File("docs")))//f.canonicalPath
 }

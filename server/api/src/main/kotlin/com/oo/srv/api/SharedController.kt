@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletResponse
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 private class SharedController(
-    @Resource private val storage:Storage
+    @Resource private val storage: com.oo.srv.api.Storage
     ,@Resource private val tt: TransactionTemplate
 ) {
     /**
@@ -74,7 +74,7 @@ private class SharedController(
         download(file,rsp,storage)
     }
 }
-fun download(file:FileInfoId, rsp: HttpServletResponse,storage: Storage){
+fun download(file:FileInfoId, rsp: HttpServletResponse,storage: com.oo.srv.api.Storage){
     // get info by fileId
     //https://stackoverflow.com/questions/7137634/getting-mimetype-subtype-with-apache-tika
     storage.fetch(file)?.let {

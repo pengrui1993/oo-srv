@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.annotation.WebFilter

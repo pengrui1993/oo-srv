@@ -22,64 +22,64 @@ object Aggregation1{
     }
 }
 class ActionData1
-fun onGuestRegisterOrCustomerLoginByPhone(data:ActionData1){
+fun onGuestRegisterOrCustomerLoginByPhone(data: ActionData1){
     Action.CUSTOMER_REGISTER_OR_LOGIN_BY_PHONE
 }
 class ActionData20
-fun onCustomerLogout(data:ActionData20){
+fun onCustomerLogout(data: ActionData20){
     Action.CUSTOMER_LOGOUT
 }
 class ActionData21
-fun onCustomerRequestUnregister(data:ActionData21){
+fun onCustomerRequestUnregister(data: ActionData21){
     Action.CUSTOMER_REQUEST_UNREGISTER
 }
 class ActionData22
-fun onCustomerCancelUnregister(data:ActionData22){
+fun onCustomerCancelUnregister(data: ActionData22){
     Action.CUSTOMER_CANCEL_UNREGISTER
 }
 class ActionData3
-fun onCustomerBindWxOpenId(data:ActionData3){
+fun onCustomerBindWxOpenId(data: ActionData3){
     Action.CUSTOMER_BIND_WX_OPENID
 }
 class ActionData4
-fun onCustomerCreateOrder(data:ActionData4){
+fun onCustomerCreateOrder(data: ActionData4){
     Action.CUSTOMER_CREATE_ORDER
 }
 class ActionData5
-fun onCustomerPayForOrder(data:ActionData5){
+fun onCustomerPayForOrder(data: ActionData5){
     Action.CUSTOMER_PAY_FOR_ORDER
 }
 class ActionData6
-fun onCustomerCancelOrder(data:ActionData6){
+fun onCustomerCancelOrder(data: ActionData6){
     Action.CUSTOMER_CANCEL_ORDER
 }
 class ActionData7
-fun onCustomerAppraiseWaitressPostOrderDone(data:ActionData6){
+fun onCustomerAppraiseWaitressPostOrderDone(data: ActionData6){
     Action.CUSTOMER_APPRAISE_WAITRESS
 }
 
 class ActionData80
-fun onWaitressRegisterByPhoneMaybeWithInvitedCodeFromOtherWaitress(data:ActionData80){
+fun onWaitressRegisterByPhoneMaybeWithInvitedCodeFromOtherWaitress(data: ActionData80){
     Action.WAITRESS_REGISTER_BY_PHONE_WITH_INVITED_CODE
 }
 class ActionData81
-fun onWaitressLoginByPhone(data:ActionData81){
+fun onWaitressLoginByPhone(data: ActionData81){
     Action.WAITRESS_LOGIN_BY_PHONE
 }
 class ActionData82
-fun onWaitressLogout(data:ActionData82){
+fun onWaitressLogout(data: ActionData82){
     Action.WAITRESS_LOGOUT
 }
 class ActionData83
-fun onWaitressRebindPhone(data:ActionData83){
+fun onWaitressRebindPhone(data: ActionData83){
     Action.WAITRESS_REBIND_PHONE_NUMBER
 }
 class ActionData84
-fun onWaitressRebindWxOpenId(data:ActionData84){
+fun onWaitressRebindWxOpenId(data: ActionData84){
     Action.WAITRESS_REBIND_WX_OPENID
 }
 class ActionData85{
-    var wid:WaitressId = 0L
+    var wid: WaitressId = 0L
     var nikeName = ""
     var realName = "刘丽"
     var idCard1 = "fileInfo.id"
@@ -102,7 +102,7 @@ class ActionData85{
     var lat = 0.0
     var radius = 10 //服务半径
 }
-fun onWaitressFillInformation(data:ActionData85){
+fun onWaitressFillInformation(data: ActionData85){
     Action.WAITRESS_FILL_INFORMATION
 }
 

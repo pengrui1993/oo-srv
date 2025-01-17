@@ -12,7 +12,7 @@ data class CustomerAppraiseWaitress(
     val id:Long
     ,val cid:Long
     ,val wid:Long
-    ,val timePoint:TimePoint
+    ,val timePoint: TimePoint
 ){
 
 }

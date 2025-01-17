@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 
 open class AuthenticationException:RuntimeException()

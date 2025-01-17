@@ -1,7 +1,7 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import com.google.gson.JsonObject
-import com.oo.srv.AppApi.entries
+import com.oo.srv.api.AppApi.entries
 import com.oo.srv.core.Roles
 import org.slf4j.LoggerFactory
 

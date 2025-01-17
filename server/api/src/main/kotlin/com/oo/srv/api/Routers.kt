@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray

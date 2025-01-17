@@ -5,14 +5,14 @@ import java.time.LocalDateTime
 import java.util.concurrent.CopyOnWriteArrayList
 internal val mods = setOf(
     InvitingCodeManager
-    ,WaitressManager
-    ,CustomerManager
-    ,OrderManager
-    ,PaymentManager
-    ,CouponManager
+    , WaitressManager
+    , CustomerManager
+    , OrderManager
+    , PaymentManager
+    , CouponManager
 )
 var initFlags = false
-fun coreInit(bm:BeanManager){
+fun coreInit(bm: BeanManager){
     if(initFlags)throw IllegalStateException("core init must be once")
     initFlags = true
     BeanMgr.delegate = bm
@@ -22,8 +22,8 @@ fun coreInit(bm:BeanManager){
     }
     EventBus.emit(SysStartedEvent())
 }
-fun coreDestroy(bm:BeanManager){
-    if(initFlags&&bm===BeanMgr.delegate){
+fun coreDestroy(bm: BeanManager){
+    if(initFlags &&bm=== BeanMgr.delegate){
         initFlags = false
         EventBus.emit(SysStoppingEvent())
         EventBus.emit(SysStoppedEvent())
@@ -37,8 +37,8 @@ interface BeanManager{
      */
     fun <T> getBean(clazz:Class<T>):T
 }
-internal object BeanMgr:BeanManager{
-    lateinit var delegate:BeanManager
+internal object BeanMgr: BeanManager {
+    lateinit var delegate: BeanManager
     override fun <T> getBean(clazz: Class<T>): T {
         return delegate.getBean(clazz)
     }
@@ -124,23 +124,23 @@ enum class EventType{
     SYS_STARTING,SYS_STARTED,SYS_STOPPING,SYS_STOPPED,SYS_TICK
 }
 interface Event{
-    val type:EventType
+    val type: EventType
 }
 
 
 typealias EventListener = (Event)->Unit
 interface EventPublisher {
-    fun emit(ev:Event)
+    fun emit(ev: Event)
 }
 interface EventRegister{
-    fun on(l:EventListener)
-    fun off(l:EventListener)
+    fun on(l: EventListener)
+    fun off(l: EventListener)
 }
-object EventBus:EventRegister,EventPublisher{
+object EventBus: EventRegister, EventPublisher {
     val size:Int get() = listeners.size
     private val listeners = CopyOnWriteArrayList<EventListener>()
-    override fun on(l: EventListener){ listeners+=l}
-    override fun off(l: EventListener){ listeners-=l}
+    override fun on(l: EventListener){ listeners +=l}
+    override fun off(l: EventListener){ listeners -=l}
     override fun emit(ev: Event) {
         listeners.forEach { it(ev) }
     }

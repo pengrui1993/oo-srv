@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import jakarta.annotation.Resource
 import org.springframework.context.annotation.Configuration

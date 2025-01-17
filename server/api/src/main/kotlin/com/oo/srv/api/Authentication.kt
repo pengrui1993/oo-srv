@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import com.wf.captcha.SpecCaptcha
 import jakarta.annotation.PostConstruct

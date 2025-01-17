@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 
 import com.oo.srv.core.InvitingCodeRepository
 import com.oo.srv.core.OrderRepository

@@ -1,4 +1,4 @@
-package com.oo.srv
+package com.oo.srv.api
 import com.oo.srv.core.BeanManager
 import com.oo.srv.core.coreDestroy
 import com.oo.srv.core.coreInit

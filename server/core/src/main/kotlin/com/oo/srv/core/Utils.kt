@@ -38,7 +38,7 @@ fun haversine(longitudeFrom: Double, latitudeFrom: Double, longitudeTo: Double, 
     val target = GlobalCoordinates(latitudeTo, longitudeTo)
     return GeodeticCalculator().calculateGeodeticCurve(Ellipsoid.Sphere, source, target).ellipsoidalDistance
 }
-fun haversine(from:Position,too:Position):Double{
+fun haversine(from: Position, too: Position):Double{
     return haversine(from.first,from.second,too.first,too.second);
 }
 /*
