@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets
 
 
 @RestController
-private object FirstPageController {
+private class FirstPageController {
     private val log = LoggerFactory.getLogger(javaClass)
     @GetMapping(FIRST_PAGE_CONFIG_URI)
     fun brand():Any{
@@ -45,7 +45,7 @@ private object FirstPageController {
 }
 
 @RestController
-private object DynamicStatesController {
+private class DynamicStatesController {
     //?pageNum=1&pageSize=10&followDynamic=false&orderByColumn=createTime&isAsc=desc
     @GetMapping(DYNAMIC_STATES_PAGE_LIST_URI)
     fun listRecentlyActressesDynamicStates():Any{//每人一条
@@ -69,7 +69,7 @@ private object DynamicStatesController {
 }
 
 @RestController
-private object StoreController {
+private class StoreController {
     //store/serviceProject/list?specialStatus=true
     @GetMapping(STORE_PAGE_SEP3_LIST_URI)
     fun specialPrice(){
@@ -88,7 +88,7 @@ private object StoreController {
 }
 
 @RestController
-private object ActressController {
+private class ActressController {
     //?pageNum=1&pageSize=10&status=1&accountType=1&latitude=&longitude=&jobTitle=%E6%8C%89%E6%91%A9
     //jobTitle=按摩
     //pageNum=1&pageSize=10&status=1&accountType=1&latitude=&longitude=&jobTitle=%E5%81%A5%E8%BA%AB

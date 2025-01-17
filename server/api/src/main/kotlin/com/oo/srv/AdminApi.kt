@@ -45,7 +45,7 @@ enum class AdminApiCode(val code:Int,val msg:String){
     ;
 }
 enum class AdminRoles{
-    ADMIN,ACCOUNTANT,OPERATOR,THIRD_SERVER
+    ADMIN,ACCOUNTANT,OPERATOR,THIRD_SERVER//WX_PAY_SERVER_CALLBACK
     ;
     fun toCoreRole(){
         when(this){

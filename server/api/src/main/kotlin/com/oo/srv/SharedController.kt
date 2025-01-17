@@ -19,32 +19,6 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
-
-@RestController
-private object AppAuthController {
-    //example https://app.xfdj.kft.ink/
-    @PostMapping(CUSTOMER_SMS_LOGIN_URI)
-    fun customerSmsLogin():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-            ,"token" to uuid()
-        )
-    }
-    @PostMapping(WAITRESS_SMS_LOGIN_URI)
-    fun waitressSmsLogin():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-            ,"token" to uuid()
-        )
-    }
-    @PostMapping(LOGOUT_URI)
-    fun logout():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-        )
-    }
-}
-
 @RestController
 private class SharedController(
     @Resource private val storage:Storage

@@ -40,7 +40,6 @@ private class TraceFilter :OncePerRequestFilter(){
         }
     }
 }
-private fun now():Long{return System.currentTimeMillis()}
 @Component
 @WebFilter(urlPatterns = ["/**"])
 @Order(Int.MAX_VALUE/2+100)

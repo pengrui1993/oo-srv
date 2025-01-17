@@ -2,14 +2,9 @@ package com.oo.srv
 
 
 import jakarta.persistence.*
-import org.apache.tika.config.TikaConfig
-import org.apache.tika.io.TikaInputStream
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.Comment
 import java.math.BigDecimal
-import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -153,13 +148,13 @@ class SysUser:AdminUserInfo{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id:Long? = null
-    var avatar:String? = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+    var avatar:String? = null//"https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
     @Column(unique = true)
-    var uname:String? = ""
-    var upwd:String? = ""
-    var name:String? = ""
-    var role:String? = ""
-    var age:Int? = 0
+    var uname:String? = null
+    var upwd:String? = null
+    var name:String? = null
+    var role:String? = null
+    var age:Int? = null
     var curToken:String? = null
     fun clear():SysUser{
         return clearFieldsToNull(SysUser::class.java,this)

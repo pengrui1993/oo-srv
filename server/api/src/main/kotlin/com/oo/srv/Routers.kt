@@ -142,7 +142,7 @@ class VueRouter{
     var meta:VueRouterMeta? = null
 }
 
-fun main() {
+fun testMain() {
 //    testToRouter()
     parseRoutersToSysPowerList()
 }

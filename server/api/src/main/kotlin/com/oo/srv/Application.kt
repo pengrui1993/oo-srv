@@ -76,7 +76,12 @@ object Syncer{
     }
     fun sync(run:()->Unit){
         if(Thread.currentThread()==worker){
-            run()
+            try{
+                run()
+
+            }catch (e:Throwable){
+                log.error(e.message,e)
+            }
         }else{
             queue.put(run)
         }

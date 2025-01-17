@@ -30,7 +30,7 @@ class AopLogic {
     @Sequence(1)
     @Around("pc()") //这个方法定义了具体的通知
     @Throws(Throwable::class)
-    fun around(pjp: ProceedingJoinPoint): Any {
+    fun around(pjp: ProceedingJoinPoint): Any? {
 //        print("around");
         val t1 = now()
         val obj = pjp.proceed()

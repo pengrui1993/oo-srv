@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import jakarta.annotation.Resource
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.apache.commons.lang3.time.DurationFormatUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,10 +27,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.io.Serializable
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 
@@ -89,6 +87,21 @@ class Config0{
         )
         return javaTimeModule
     }
+
+}
+private fun durationFmt() {
+    val startInstant = Instant.parse("2015-05-01T00:00:00Z") //ISO 8601 表示法
+    val endInstant = Instant.parse("2015-05-03T02:30:00Z")
+    val duration = Duration.between(startInstant, endInstant) //得到兩個Instant差的Duration
+    val resultDurationString1 = DurationFormatUtils.formatDuration(duration.toMillis(), "dd'天'HH'時'mm'分'ss'秒'")
+    println(resultDurationString1) //輸出: 02天02時30分00秒
+    val resultDurationString2 =
+        DurationFormatUtils.formatDuration(duration.toMillis(), "dd'天'HH'時'mm'分'ss'秒'", false)
+    println(resultDurationString2) //輸出: 2天2時30分0秒  //(10以下的數字不補0)
+    val resultDurationString3 = DurationFormatUtils.formatDuration(duration.toMillis(), "HH'時'mm'分'ss'秒'")
+    println(resultDurationString3) //輸出: 50時30分00秒  //(沒有設定小時以上的單位，小時以上全部由小時表示:50小時)
+    val resultDurationString4 = DurationFormatUtils.formatDurationISO(duration.toMillis())
+    println(resultDurationString4) //輸出: P0Y0M2DT2H30M0.000S //ISO 8601標準格式
 }
 @Component
 private class RedisListener(

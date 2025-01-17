@@ -1,17 +1,11 @@
 package com.oo.srv
 
-import com.wf.captcha.SpecCaptcha
-import jakarta.annotation.PostConstruct
 import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
-import org.slf4j.LoggerFactory
 import org.springframework.data.domain.*
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.caseSensitive
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -32,85 +26,8 @@ private class AdminTransactionController(@Resource val tranRepo:BizTranRepo){
 
     }
 }
-
-
 @RestController
-class AdminAuthController(
-    @Resource val sessionManager:AdminSessionManager
-    ,@Resource val userRepo:SysUserRepo
-){
-    @PostConstruct
-    private fun init(){
-        val saved = userRepo.save(
-            SysUser().also
-            { it.name="tony";it.role="admin-token"
-                it.uname="admin";it.upwd="111111"
-                it.age = 13
-            }
-        )
-    }
-    //ocr-captcha
-    private val log = LoggerFactory.getLogger(javaClass)
-    @GetMapping(ADMIN_AUTH_CAPTCHA_URI)
-    fun captcha(request:HttpServletRequest,response:HttpServletResponse){
-        val captcha = SpecCaptcha(130, 48, 4)
-        response.contentType = "image/gif"
-        response.setHeader("Pragma", "No-cache")
-        response.setHeader("Cache-Control", "no-cache")
-        response.setDateHeader("Expires", 0L)
-        val session = request.getSession(true)
-        val codeTimePair = captcha.text().lowercase(Locale.getDefault()) to LocalDateTime.now().plusMinutes(10)
-        session.setAttribute(AUTH_CAPTCHA_KEY, codeTimePair)
-        captcha.out(response.outputStream)
-    }
-    @PostMapping(ADMIN_USER_LOGIN_URI)
-    fun login(@RequestBody body:Map<String,String>,request:HttpServletRequest):Any{
-        log.info("admin.login:{}",gson.toJson(body))
-        val uname = body["username"]
-        val upwd = body["password"]
-        val code = body["verification"]!!
-        val err = {
-            mapOf(
-            "code" to AdminApiCode.AUTH_ERR.code,
-            "message" to "Account and password are incorrect.",
-        )}
-        if(Objects.isNull(uname)||uname!!.isEmpty())return err()
-        if(Objects.isNull(upwd)||upwd!!.isEmpty())return err()
-        val session = request.getSession(false)
-        if(Objects.isNull(session))throw AdminVerificationExpiredException()
-        val cap = session!!.getAttribute(AUTH_CAPTCHA_KEY)
-        if(Objects.isNull(cap))throw AdminVerificationExpiredException()
-        val pair = cap  as Pair<String,LocalDateTime>
-        if(pair.second.isBefore(LocalDateTime.now())) {
-            session.removeAttribute(AUTH_CAPTCHA_KEY)
-            throw AdminVerificationExpiredException()
-        }
-        if(code!=pair.first) throw AdminTokenExpiredException()
-        session.removeAttribute(AUTH_CAPTCHA_KEY)
-        val ex = Example.of(SysUser().clear().also { it.upwd = upwd;it.uname=uname }
-            , ExampleMatcher.matching().withIgnoreNullValues()
-                .withMatcher("uname",caseSensitive())
-                .withMatcher("upwd",caseSensitive())
-        )
-        val res = userRepo.findOne(ex)
-        if(res.isEmpty)return err()
-        val token = sessionManager.createToken(res.get())
-        session.invalidate()
-        return mapOf(
-            "code" to AdminApiCode.OK.code,
-            "data" to token,
-        )
-    }
-    @PostMapping(ADMIN_USER_LOGOUT_URI)
-    fun logout(req:HttpServletRequest):Any{
-        val token = req.getHeader(ADMIN_AUTH_KEY)
-        sessionManager.destroyToken(token!!)
-        return mapOf(
-            "code" to AdminApiCode.OK.code,
-            "data" to "success",
-        )
-    }
-
+private class RoleController{
     private val usersRoles = lazy {
         ClassLoader.getSystemResourceAsStream("users.json")
             .use {gson.fromJson(readInputStreamAsString(it!!),HashMap::class.java) as Map<String,*>}
@@ -133,9 +50,8 @@ class AdminAuthController(
         )
     }
 }
-
 @RestController
-private object AdminRouterController{
+private class AdminRouterController{
     val allRouters = lazy {
         ClassLoader.getSystemResourceAsStream("routers.json")
             .use {readInputStreamAsString(it!!).let {routers-> gson.fromJson(routers,List::class.java) }}
@@ -171,6 +87,7 @@ private class AdminRoleController(@Resource  val repo:BizApiCallRepository){
         Sort.by(listOf(Sort.Order.asc("seatNumber")
                         ,Sort.Order.desc("createdTime")))
     }
+    @Write
     @PutMapping(ADMIN_ROLE_PERM_UPDATE)
     fun update(@RequestBody body:String):Any{
         println(body)// see rolePermUpdate.json
@@ -188,7 +105,7 @@ private class AdminRoleController(@Resource  val repo:BizApiCallRepository){
 
 }
 @RestController
-object AdminArticleController{
+class AdminArticleController{
     data class PageParams (
         @Min(1) var page: Int = 1
         ,@Min(1) var limit: Int = 10

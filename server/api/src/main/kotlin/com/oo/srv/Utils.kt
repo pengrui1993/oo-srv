@@ -12,7 +12,7 @@ import java.nio.file.Paths
 import java.util.*
 
 val gson = Gson()
-
+fun now():Long{return System.currentTimeMillis()}
 
 fun uuid():String{
     return UUID.randomUUID().toString().replace("-","")
