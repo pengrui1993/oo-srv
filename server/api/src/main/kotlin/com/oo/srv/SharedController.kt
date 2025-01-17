@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.core.io.FileSystemResource
@@ -18,6 +19,32 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
+
+@RestController
+private object AppAuthController {
+    //example https://app.xfdj.kft.ink/
+    @PostMapping(CUSTOMER_SMS_LOGIN_URI)
+    fun customerSmsLogin():Any{
+        return mapOf(
+            "code" to ApiCode.OK.code
+            ,"token" to uuid()
+        )
+    }
+    @PostMapping(WAITRESS_SMS_LOGIN_URI)
+    fun waitressSmsLogin():Any{
+        return mapOf(
+            "code" to ApiCode.OK.code
+            ,"token" to uuid()
+        )
+    }
+    @PostMapping(LOGOUT_URI)
+    fun logout():Any{
+        return mapOf(
+            "code" to ApiCode.OK.code
+        )
+    }
+}
+
 @RestController
 private class SharedController(
     @Resource private val storage:Storage
@@ -28,7 +55,8 @@ private class SharedController(
      */
     data class FileExistReq(
         @Min(0) val size: Long,
-        @NotBlank val sha1: String
+        @NotBlank @Size(min=1, max = 200)
+        val sha1: String
     )
     @GetMapping(FILE_EXISTS)
     fun fileExists(@NotNull @Validated req: FileExistReq):Any {

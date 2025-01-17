@@ -25,7 +25,7 @@ class TestInitRunner(
             item.price = jo.getAsJsonPrimitive("price").asBigDecimal
             item.status = jo.getAsJsonPrimitive("status").asString
             val res = transRepo.save(item)
-            println(res.order_no)
+//            println(res.order_no)
         }
 
     }

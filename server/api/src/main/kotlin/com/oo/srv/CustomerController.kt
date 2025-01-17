@@ -1,44 +1,12 @@
 package com.oo.srv
 
-import jakarta.annotation.Resource
-import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
-import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.slf4j.LoggerFactory
-import org.springdoc.core.annotations.ParameterObject
-import org.springframework.core.io.FileSystemResource
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.transaction.support.TransactionTemplate
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
-import java.util.*
 
-@RestController
-private object AuthController {
-    //example https://app.xfdj.kft.ink/
-    @PostMapping(SMS_LOGIN_URI)
-    fun smsLogin():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-            ,"token" to UUID.randomUUID().toString().replace("-","")
-        )
-    }
-    @PostMapping(LOGOUT_URI)
-    fun logout():Any{
-        return mapOf(
-            "code" to ApiCode.OK.code
-        )
-    }
-}
 
 @RestController
 private object FirstPageController {

@@ -4,6 +4,7 @@
 		<view class="text-area">
 			<text class="title">{{title}}</text>
 		</view>
+		<button @click="goToAbout()">about</button>
 	</view>
 </template>
 
@@ -11,14 +12,18 @@
 	export default {
 		data() {
 			return {
-				title: 'Hello'
+				title: 'WaitressPage'
 			}
 		},
 		onLoad() {
 
 		},
 		methods: {
-
+			goToAbout(){
+				uni.navigateTo({
+					url:'/pages/about/about'
+				})
+			}
 		}
 	}
 </script>

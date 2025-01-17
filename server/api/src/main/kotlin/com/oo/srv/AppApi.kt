@@ -11,7 +11,7 @@ enum class AppApi(val uri:String
                   , private val rw:Boolean=READ
                   , val auth:Boolean = false
 ) {
-     LOGIN(SMS_LOGIN_URI,WRITE)
+     LOGIN(CUSTOMER_SMS_LOGIN_URI,WRITE)
     ,LOGOUT(LOGOUT_URI,WRITE)
     ,FIRST_PAGE_1(FIRST_PAGE_CONFIG_URI)
     ,FIRST_PAGE_2(FIRST_PAGE_ACTRESS3_URI)

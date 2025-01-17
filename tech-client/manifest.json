@@ -139,10 +139,10 @@
         }
     },
     "h5" : {
-        "template" : "template.h5.html",
+        "template" : "",
         "router" : {
-            "mode" : "history",
-            "base" : ""
+            "mode" : "hash",
+            "base" : "./"
         },
         "sdkConfigs" : {
             "maps" : {
@@ -156,6 +156,9 @@
         },
         "uniStatistics" : {
             "enable" : true
+        },
+        "devServer" : {
+            "https" : false
         }
     },
     "vueVersion" : "3",

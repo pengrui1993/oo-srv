@@ -5,6 +5,7 @@ import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Min
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.*
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.caseSensitive
@@ -177,10 +178,10 @@ private class AdminRoleController(@Resource  val repo:BizApiCallRepository){
 }
 @RestController
 object AdminArticleController{
-    class PageParams {
-        var page: Int = 1
-        var limit: Int = 10
-    }
+    data class PageParams (
+        @Min(1) var page: Int = 1
+        ,@Min(1) var limit: Int = 10
+    )
     @GetMapping(ADMIN_ARTICLE_LIST)
     fun list(@Valid params:PageParams):Any{
         return ClassLoader.getSystemResourceAsStream("articleList.json")

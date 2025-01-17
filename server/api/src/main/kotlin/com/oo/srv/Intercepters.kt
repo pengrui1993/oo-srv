@@ -38,9 +38,11 @@ class Config2(@Resource private val auth:AppAuthInterceptor
 @Component
 class AdminAuthInterceptor(
     @Resource val sessionManager:AdminSessionManager
+    ,@Resource val propertiesAccessor: PropertiesAccessor
 ):AsyncHandlerInterceptor{
     private val log = LoggerFactory.getLogger(javaClass)
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        if(propertiesAccessor.debug)return true
         val api = AdminApi.from(request.requestURI)
         if(!api.auth)return true
         val token = request.getHeader(ADMIN_AUTH_KEY)
@@ -59,8 +61,6 @@ class AppAuthInterceptor(
 ) : AsyncHandlerInterceptor{
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if(propertiesAccessor.debug)return true
-        val test = request.getHeader("SEC_KEY")
-        if(Objects.equals(test,"test"))return true
         val api = AppApi.from(request.requestURI)
         if(!api.auth)return true
         val token = request.getHeader(AUTH_KEY)
