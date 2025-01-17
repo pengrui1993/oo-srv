@@ -14,7 +14,10 @@ const name = defaultSettings.title || 'vue Element Admin' // page title
 // You can change the port by the following method:
 // port = 9527 npm run dev OR npm run dev --port = 9527
 const port = process.env.port || process.env.npm_config_port || 9527 // dev port
-
+// const isProduction = process.env.NODE_ENV === 'production'
+// const isDevelopment = process.env.NODE_ENV === 'development'
+// const isStaging = process.env.NODE_ENV === 'stage'
+console.log('NODE_ENV', process.env.NODE_ENV)
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -24,11 +27,10 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
-  outputDir: 'dist',
+  publicPath: './',
+  outputDir: `dist`,
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
-  productionSourceMap: false,
   devServer: {
     open: true,
     port: port,
@@ -45,6 +47,7 @@ module.exports = {
       }
     }
   },
+  productionSourceMap: false,
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
@@ -53,10 +56,10 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    devtool: 'source-map' // 确保 source map 已启用
   },
   chainWebpack(config) {
-    // it can improve the speed of the first screen, it is recommended to turn on preload
     // it can improve the speed of the first screen, it is recommended to turn on preload
     config.plugin('preload').tap(() => [
       {
@@ -87,7 +90,6 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
-
     config
       .when(process.env.NODE_ENV !== 'development',
         config => {

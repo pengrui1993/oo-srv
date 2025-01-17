@@ -1,6 +1,7 @@
 package com.oo.srv
 
 import com.wf.captcha.SpecCaptcha
+import jakarta.annotation.PostConstruct
 import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -38,6 +39,16 @@ class AdminAuthController(
     @Resource val sessionManager:AdminSessionManager
     ,@Resource val userRepo:SysUserRepo
 ){
+    @PostConstruct
+    private fun init(){
+        val saved = userRepo.save(
+            SysUser().also
+            { it.name="tony";it.role="admin-token"
+                it.uname="admin";it.upwd="111111"
+                it.age = 13
+            }
+        )
+    }
     //ocr-captcha
     private val log = LoggerFactory.getLogger(javaClass)
     @GetMapping(ADMIN_AUTH_CAPTCHA_URI)

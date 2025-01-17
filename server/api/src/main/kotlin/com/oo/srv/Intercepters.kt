@@ -42,7 +42,6 @@ class AdminAuthInterceptor(
 ):AsyncHandlerInterceptor{
     private val log = LoggerFactory.getLogger(javaClass)
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        if(propertiesAccessor.debug)return true
         val api = AdminApi.from(request.requestURI)
         if(!api.auth)return true
         val token = request.getHeader(ADMIN_AUTH_KEY)
